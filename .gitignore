@@ -1,24 +1,34 @@
-# Django / Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 *.sqlite3
+
+# Django
+*.log
+local_settings.py
 db.sqlite3
 
-# Virtual env
+# Virtual environment
 .venv/
 env/
 venv/
 
-# IDE files
+# VSCode & PyCharm
 .idea/
 .vscode/
-*.iml
 
-# Logs
-*.log
+# Migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Media & Static files
+media/
+staticfiles/
+static/
+logs/
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Pytest / Coverage
+.coverage
+htmlcov/

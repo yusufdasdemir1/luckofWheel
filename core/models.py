@@ -12,7 +12,7 @@ class BaseModel(models.Model):
 class Companies(BaseModel):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20,unique=True)
     email = models.EmailField(unique=True)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
     thumbnail = models.CharField(max_length=255, blank=True, null=True)
@@ -30,7 +30,7 @@ class Users(BaseModel):
     password = models.CharField(max_length=255)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE,related_name='users')
     is_admin = models.BooleanField(default=False)
-    is_show_wheel= models.BooleanField(default=False)
+    is_show_wheel= models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name} {self.surname}"
