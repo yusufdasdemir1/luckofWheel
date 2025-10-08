@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from core.serializers import CompanyUpdateSerializer
 from core.models import Companies, Users
-
+from django.utils.text import slugify
 
 class CompanyUpdateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -52,12 +52,18 @@ class CompanyUpdateView(APIView):
 
         for field, value in serializer.validated_data.items():
             setattr(company, field, value)
+
+        if "title" in serializer.validated_data:
+            company.slug = slugify(serializer.validated_data["title"])
+
         company.save()
 
         # 🔁 Eğer e-posta değiştiyse admin kullanıcının e-postasını da güncelle
         if "email" in serializer.validated_data:
             new_email = serializer.validated_data["email"]
             Users.objects.filter(company=company, is_admin=True).update(email=new_email)
+
+
 
         return Response(
             {
