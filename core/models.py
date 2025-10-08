@@ -9,6 +9,7 @@ class Companies(models.Model):
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
     thumbnail = models.CharField(max_length=255, blank=True, null=True)
     slug = models.SlugField(unique=True)
+    is_show_wheel = models.BooleanField(default=True)
     show_before_meeting = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -49,7 +50,6 @@ class Users(AbstractBaseUser, PermissionsMixin):
     phone=models.CharField(max_length=20)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='users', null=True)
     is_admin = models.BooleanField(default=False)
-    is_show_wheel = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -91,6 +91,7 @@ class Gifts(models.Model):
 class EarnedWins(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='wins')
     gift = models.ForeignKey(Gifts, on_delete=models.CASCADE, related_name='earned_wins')
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='earned_wins')
     is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

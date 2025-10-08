@@ -76,12 +76,14 @@ class RegisterView(APIView):
                     email=email,
                     phone=phone,
                     show_before_meeting=data.get("show_before_meeting", False),
+                    is_show_wheel=data.get("is_show_wheel", True),
                     slug=slugify(data["company_title"]),
                 )
 
                 user = Users.objects.create(
                     name=data["name"],
                     surname=data["surname"],
+                    phone=phone,
                     email=email,
                     password=make_password(data["password"]),
                     company=company,

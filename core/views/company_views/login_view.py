@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
 from core.serializers import LoginSerializer
-from core.models import Users
+from core.models import Companies,Users
 
 
 class LoginView(APIView):
@@ -21,29 +21,31 @@ class LoginView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        email = serializer.validated_data.get("email")
+        company_email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
 
         try:
-            user = Users.objects.get(email=email)
-        except Users.DoesNotExist:
+            company = Companies.objects.get(email=company_email)
+        except Companies.DoesNotExist:
             return Response(
-                {"error": "Bu e-posta adresine ait kullanıcı bulunamadı."},
+                {"error": "Bu e-posta adresine ait bir firma bulunamadı."},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        # 🔐 Şifre kontrolü: check_password() artık model metodundan yapılır
+
+        try:
+            user = Users.objects.get(company=company, is_admin=True)
+        except Users.DoesNotExist:
+            return Response(
+                {"error": "Bu firmaya ait admin kullanıcısı bulunamadı."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # 🔐 3️⃣ Şifre kontrolü
         if not user.check_password(password):
             return Response(
                 {"error": "E-posta veya şifre hatalı."},
                 status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        # 🔐 Sadece admin kullanıcılar giriş yapabilir
-        if not user.is_admin:
-            return Response(
-                {"error": "Bu işlem sadece admin kullanıcılar içindir."},
-                status=status.HTTP_403_FORBIDDEN
             )
 
         # 🔑 Token üretimi
@@ -55,7 +57,7 @@ class LoginView(APIView):
                 "id": user.id,
                 "name": user.name,
                 "surname": user.surname,
-                "email": user.email,
+                "email": company.email,
                 "is_admin": user.is_admin,
                 "company": user.company.title if user.company else None,
             },

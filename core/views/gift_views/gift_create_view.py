@@ -30,7 +30,7 @@ class GiftCreateView(APIView):
                 examples={
                     "application/json": {
                         "message": "Hediye oluşturuldu.",
-                        "gift": {
+                        "gift_views": {
                             "id": 5,
                             "title": "%10 indirim",
                             "description": "Sonraki hizmette geçerli",
@@ -78,7 +78,7 @@ class GiftCreateView(APIView):
 
         return Response({
             "message": "Hediye oluşturuldu.",
-            "gift": {
+            "gift_views": {
                 "id": gift.id,
                 "title": gift.title,
                 "description": gift.description,
