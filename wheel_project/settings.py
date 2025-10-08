@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
 ]
+AUTH_USER_MODEL = 'core.Users'
 
 
 MIDDLEWARE = [
@@ -143,3 +144,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': "JWT token'ınızı buraya girin. Format: Bearer <access_token>",
+        }
+    },
+    'USE_SESSION_AUTH': False,  # Django'nun kendi oturum sistemini devre dışı bırakır
+}

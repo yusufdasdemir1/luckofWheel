@@ -1,6 +1,5 @@
 from django.db import models
-
-# Create your models here.
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class Companies(models.Model):
     title = models.CharField(max_length=255)
@@ -18,21 +17,61 @@ class Companies(models.Model):
     def __str__(self):
         return self.title
 
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Normal kullanıcı oluşturur.
+        """
+        if not email:
+            raise ValueError("Email alanı zorunludur.")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-class Users(models.Model):
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Sadece admin (is_admin=True) kullanıcı oluşturur.
+        """
+        extra_fields.setdefault('is_admin', True)
+        return self.create_user(email, password, **extra_fields)
+
+class Users(AbstractBaseUser, PermissionsMixin):
+    """
+    Sade kullanıcı modeli — sadece senin belirlediğin alanlarla.
+    Django'nun is_staff, is_superuser gibi alanları yok.
+    """
     name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     password = models.CharField(max_length=255)
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE,related_name='users')
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='users', null=True)
     is_admin = models.BooleanField(default=False)
-    is_show_wheel= models.BooleanField(default=True)
+    is_show_wheel = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    USERNAME_FIELD = 'id'
+    REQUIRED_FIELDS = ['name', 'surname']
+
+    objects = BaseUserManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["email", "company"], name="unique_email_per_company")
+        ]
 
     def __str__(self):
         return f"{self.name} {self.surname}"
+
+    @property
+    def is_staff(self):
+        """
+        Django admin uyumluluğu için zorunlu.
+        is_admin True olanları staff gibi gösterir ama DB'de kolon oluşturmaz.
+        """
+        return self.is_admin
 
 
 class Gifts(models.Model):

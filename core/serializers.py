@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from core.models import Users,Gifts
+
 
 class RegisterSerializer(serializers.Serializer):
     # USER fields
@@ -18,3 +20,16 @@ class RegisterSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+
+class PublicRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ('name', 'surname', 'email')
+
+
+class GiftSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gifts
+        fields = ["id", "title", "description", "chance", "company"]
+        read_only_fields = ["company"]
