@@ -46,6 +46,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
     surname = models.CharField(max_length=255)
     email = models.EmailField()
     password = models.CharField(max_length=255)
+    phone=models.CharField(max_length=20)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='users', null=True)
     is_admin = models.BooleanField(default=False)
     is_show_wheel = models.BooleanField(default=True)
