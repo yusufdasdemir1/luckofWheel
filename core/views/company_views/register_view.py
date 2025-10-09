@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import make_password
 class RegisterView(APIView):
     @swagger_auto_schema(
         operation_summary="Yeni şirket ve admin kaydı oluşturur",
+        tags=["ADMIN AUTHENTICATION"],
         operation_description=(
             "Yeni bir firma kaydı oluşturur ve otomatik olarak admin kullanıcı atar.\n\n"
             "**company_email** ve **phone** alanları unique (benzersiz) olmalıdır."

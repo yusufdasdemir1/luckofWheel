@@ -14,6 +14,7 @@ class CompanyUpdateView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🏢 Şirket bilgilerini güncelle (slug bazlı, sadece admin)",
+        tags=["Admin Actions"],
         request_body=CompanyUpdateSerializer,
         responses={
             200: "Güncelleme başarılı",

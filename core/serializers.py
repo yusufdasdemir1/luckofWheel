@@ -79,3 +79,59 @@ class CompanyUpdateSerializer(serializers.Serializer):
 
 class EarnedWinStatusSerializer(serializers.Serializer):
     is_used = serializers.BooleanField(required=True, help_text="Ödül kullanıldı mı (true/false)")
+
+
+class GiftListSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source="company.title", read_only=True)
+
+    class Meta:
+        model = Gifts
+        fields = ["id", "title", "description", "chance", "company_name"]
+
+
+class GiftDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gifts
+        fields = ["title", "chance"]
+
+
+class GiftUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gifts
+        fields = ["title", "description", "chance"]
+        extra_kwargs = {
+            "title": {"required": False},
+            "description": {"required": False},
+            "chance": {"required": False},
+        }
+
+    def validate(self, data):
+        """Toplam chance 1.0'ı geçemez."""
+        instance = self.instance  # mevcut hediye
+        user = self.context["request"].user
+        company = getattr(user, "company", None)
+
+        # Eğer chance güncellenmiyorsa kontrol gerekmez
+        if "chance" not in data or not company:
+            return data
+
+        new_chance = data["chance"]
+        old_chance = instance.chance
+
+        # Şirketin diğer hediyelerinin toplamını al (bu hediyeyi hariç tut)
+        total_chance = (
+            Gifts.objects.filter(company=company)
+            .exclude(id=instance.id)
+            .aggregate(total=Sum("chance"))["total"]
+            or 0
+        )
+
+        # Yeni total hesapla
+        updated_total = total_chance + new_chance
+
+        if updated_total > 1.0:
+            raise serializers.ValidationError(
+                f"Toplam olasılık 1'i geçemez. (Şu anki toplam: {round(updated_total, 2)})"
+            )
+
+        return data

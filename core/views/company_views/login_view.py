@@ -10,6 +10,7 @@ from core.models import Companies,Users
 class LoginView(APIView):
     @swagger_auto_schema(
         operation_summary="Admin login (JWT token döner)",
+        tags=["ADMIN AUTHENTICATION"],
         request_body=LoginSerializer,
         responses={
             200: "Giriş başarılı",

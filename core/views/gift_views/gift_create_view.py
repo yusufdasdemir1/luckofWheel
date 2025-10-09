@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from core.models import Gifts
 from core.serializers import GiftSerializer
 
 
@@ -18,6 +17,7 @@ class GiftCreateView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Yeni hediye oluştur (sadece admin kullanıcılar)",
+        tags=["gift"],
         operation_description=(
             "JWT ile giriş yapmış admin kullanıcının firmasına yeni bir ödül ekler.\n\n"
             "**chance:** 0-1 arası oran (%25 için 0.25 yazılır). "
