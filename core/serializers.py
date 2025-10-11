@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Users,Gifts,EarnedWins
+from core.models import Users, Gifts, EarnedWins, Services
 from django.db.models import Sum
 
 class RegisterSerializer(serializers.Serializer):
@@ -135,3 +135,36 @@ class GiftUpdateSerializer(serializers.ModelSerializer):
             )
 
         return data
+
+
+class ServiceCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Services
+        fields=["title", "description", "duration", "price"]
+
+
+class ServiceListSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source="company.title", read_only=True)
+
+    class Meta:
+        model = Services
+        fields = ["title", "description", "duration", "price","is_active","company_name"]
+
+
+class PublicServiceListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Services
+        fields = ["title", "description", "duration", "price"]
+
+
+class ServiceUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Services
+        fields = ["title", "description", "duration", "price", "is_active"]
+        extra_kwargs = {
+            "title": {"required": False},
+            "description": {"required": False},
+            "duration": {"required": False},
+            "price": {"required": False},
+            "is_active": {"required": False},
+        }

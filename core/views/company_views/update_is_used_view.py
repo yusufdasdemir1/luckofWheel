@@ -15,7 +15,7 @@ class EarnedWinStatusUpdateView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🎁 Ödül kullanım durumunu güncelle (sadece admin)",
-        tags=["Admin Actions"],
+        tags=["ADMIN ACTIONS"],
         operation_description=(
             "Admin, kendi şirketine ait bir ödül kaydının `is_used` durumunu değiştirebilir.\n"
             "Yalnızca `is_used` (True/False) alanı güncellenir."

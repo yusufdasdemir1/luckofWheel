@@ -14,7 +14,7 @@ class GiftDetailView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🎁 Tek bir hediyeyi getir (sadece admin)",
-        tags=["gift"],
+        tags=["GIFT"],
         operation_description="Admin kendi şirketine ait belirli bir hediyeyi detaylı görüntüleyebilir.",
         responses={
             200: openapi.Response(

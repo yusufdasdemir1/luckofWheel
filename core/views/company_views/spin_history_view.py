@@ -15,7 +15,7 @@ class CompanySpinHistoryView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🎡 Spin geçmişi (filtreli, sadece admin)",
-        tags=["Admin Actions"],
+        tags=["ADMIN ACTIONS"],
         operation_description=(
             "Admin kendi şirketine ait spin geçmişini görüntüler.\n\n"
             "Opsiyonel query parametreleri:\n"

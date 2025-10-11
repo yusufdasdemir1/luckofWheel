@@ -14,7 +14,7 @@ class GiftDeleteView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🎁 Hediye sil (sadece admin)",
-        tags=["gift"],
+        tags=["GIFT"],
         operation_description=(
             "Admin kendi şirketine ait bir hediyeyi silebilir.\n\n"
             "Yalnızca `company` ile ilişkili hediyeler silinebilir."

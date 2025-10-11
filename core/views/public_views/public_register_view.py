@@ -56,6 +56,7 @@ class PublicRegisterView(APIView):
                 examples={"application/json": {"error": "Firma bulunamadı."}},
             ),
         },
+        tags=["PUBLIC"]
     )
     def post(self, request, slug):
         # Firma kontrolü

@@ -16,7 +16,7 @@ class GiftListView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🎁 Firma hediyelerini listele (sadece admin)",
-        tags=["gift"],
+        tags=["GIFT"],
         operation_description=(
             "Admin kendi şirketine ait tüm hediyeleri görüntüler.\n\n"
             "- JWT token gereklidir.\n"

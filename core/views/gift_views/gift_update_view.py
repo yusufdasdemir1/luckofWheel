@@ -15,7 +15,7 @@ class GiftUpdateView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🎁 Hediye düzenle (sadece admin)",
-        tags=["gift"],
+        tags=["GIFT"],
         operation_description=(
             "Admin, kendi şirketine ait bir hediyenin başlık, açıklama veya oranını güncelleyebilir.\n\n"
             "- Sadece `title`, `description` ve `chance` alanları düzenlenebilir.\n"

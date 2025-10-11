@@ -14,7 +14,7 @@ class GiftDeleteAllView(APIView):
 
     @swagger_auto_schema(
         operation_summary="🗑️ Tüm hediyeleri sil (sadece admin)",
-        tags=["gift"],
+        tags=["GIFT"],
         operation_description=(
             "Admin, kendi şirketine ait **tüm hediye kayıtlarını** silebilir.\n\n"
             "- JWT doğrulaması gereklidir.\n"
