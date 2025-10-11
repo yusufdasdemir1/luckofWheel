@@ -56,9 +56,17 @@ class CompanySpinHistoryView(APIView):
         if user_id:
             queryset=queryset.filter(user_id=user_id)
 
-        elif is_used is not None:
-            is_used_bool = str(is_used).lower() in ["true", "1", "yes"]
-            queryset = queryset.filter(is_used=is_used_bool)
+        if is_used is not None:
+            if is_used.lower() == "true":
+                queryset = queryset.filter(is_used=True)
+            elif is_used.lower() == "false":
+                queryset = queryset.filter(is_used=False)
+
+        if not queryset.exists():
+            return Response(
+                {"message": "Belirtilen filtrelere göre eşleşen kayıt bulunamadı."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer=EarnedWinsSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

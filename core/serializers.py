@@ -86,7 +86,7 @@ class GiftListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gifts
-        fields = ["id", "title", "description", "chance", "company_name"]
+        fields = ["id", "title", "description", "chance", "company_name","is_active"]
 
 
 class GiftDeleteSerializer(serializers.ModelSerializer):
@@ -98,11 +98,12 @@ class GiftDeleteSerializer(serializers.ModelSerializer):
 class GiftUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gifts
-        fields = ["title", "description", "chance"]
+        fields = ["title", "description", "chance","is_active"]
         extra_kwargs = {
             "title": {"required": False},
             "description": {"required": False},
             "chance": {"required": False},
+            "is_active":{"required": False},
         }
 
     def validate(self, data):
@@ -116,7 +117,6 @@ class GiftUpdateSerializer(serializers.ModelSerializer):
             return data
 
         new_chance = data["chance"]
-        old_chance = instance.chance
 
         # Şirketin diğer hediyelerinin toplamını al (bu hediyeyi hariç tut)
         total_chance = (

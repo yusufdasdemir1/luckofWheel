@@ -80,17 +80,22 @@ class Gifts(models.Model):
     description = models.TextField(blank=True, null=True)
     chance = models.FloatField(help_text="Ödülün çıkma olasılığı (0-1 arası değer)")
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='gifts')
+    is_active = models.BooleanField(default=True, help_text="Bu hediye şu anda aktif mi?")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
     def __str__(self):
-        return f"{self.title} ({self.company.title})"
+        return f"{self.title} ({'Aktif' if self.is_active else 'Pasif'})"
 
 
 class EarnedWins(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='wins')
-    gift = models.ForeignKey(Gifts, on_delete=models.CASCADE, related_name='earned_wins')
+
+    gift_title = models.CharField(max_length=255, help_text="Kazanılan hediyenin adı")
+    gift_description = models.TextField(blank=True, null=True, help_text="Kazanılan hediyenin açıklaması")
+    gift_chance = models.FloatField(blank=True, null=True, help_text="Kazanılan hediyenin şans oranı")
+    note = models.TextField(blank=True, null=True, help_text="Opsiyonel admin notu")
+
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='earned_wins')
     is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

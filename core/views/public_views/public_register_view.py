@@ -128,7 +128,7 @@ class PublicRegisterView(APIView):
                 return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
 
         # 🎁 Rastgele ödül seçimi
-        gifts = Gifts.objects.filter(company=company)
+        gifts = Gifts.objects.filter(company=company,is_active=True)
         if not gifts.exists():
             return Response({"error": "Bu firmaya ait hediye tanımlı değil."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -146,7 +146,13 @@ class PublicRegisterView(APIView):
             selected_gift = random.choice(gifts)
 
         # 🧾 Kaydet
-        EarnedWins.objects.create(user=user, gift=selected_gift,company=company)
+        EarnedWins.objects.create(
+            user=user,
+            company=company,
+            gift_title=selected_gift.title,
+            gift_description=selected_gift.description,
+            gift_chance=selected_gift.chance
+        )
 
         return Response(
             {
