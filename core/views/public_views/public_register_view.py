@@ -112,12 +112,13 @@ class PublicRegisterView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        # 🔄 Son spin kontrolü (48 saat)
+
         last_spin = EarnedWins.objects.filter(user=user).order_by("-created_at").first()
         if last_spin:
+            cooldown = company.spin_cooldown_hours
             elapsed_hours = (timezone.now() - last_spin.created_at).total_seconds() / 3600
-            if elapsed_hours < 48:
-                remaining_hours = 48 - elapsed_hours
+            if elapsed_hours < cooldown:
+                remaining_hours = cooldown - elapsed_hours
                 days = int(remaining_hours // 24)
                 hours = int(remaining_hours % 24)
                 if days > 0 and hours > 0:
@@ -160,7 +161,7 @@ class PublicRegisterView(APIView):
                 "message": f"Tebrikler! {selected_gift.title} kazandınız 🎉",
                 "gift_views": selected_gift.title,
                 "company": company.title,
-                "next_spin_available_in_hours": 48,
+                "next_spin_available_in_hours": company.spin_cooldown_hours,
             },
             status=status.HTTP_201_CREATED,
         )

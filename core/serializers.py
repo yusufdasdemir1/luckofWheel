@@ -75,6 +75,7 @@ class CompanyUpdateSerializer(serializers.Serializer):
     phone = serializers.CharField(required=False)
     show_before_meeting = serializers.BooleanField(required=False)
     is_show_wheel = serializers.BooleanField(required=False)
+    spin_cooldown_hours=serializers.IntegerField(required=False,min_value=1)
 
 
 class EarnedWinStatusSerializer(serializers.Serializer):

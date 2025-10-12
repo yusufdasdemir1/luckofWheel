@@ -11,6 +11,8 @@ class Companies(models.Model):
     slug = models.SlugField(unique=True)
     is_show_wheel = models.BooleanField(default=True)
     show_before_meeting = models.BooleanField(default=False)
+    spin_cooldown_hours=models.PositiveIntegerField(default=48)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

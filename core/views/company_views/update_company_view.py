@@ -75,7 +75,8 @@ class CompanyUpdateView(APIView):
                     "email": company.email,
                     "phone": company.phone,
                     "is_show_wheel": company.is_show_wheel,
-                    "show_before_meeting": company.show_before_meeting
+                    "show_before_meeting": company.show_before_meeting,
+                    "spin_cooldown_hours": company.spin_cooldown_hours,
                 }
             },
             status=status.HTTP_200_OK
