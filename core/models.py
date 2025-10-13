@@ -111,6 +111,7 @@ class EarnedWins(models.Model):
 class Meetings(models.Model):
     date = models.DateField()
     time = models.TimeField()
+    end_time = models.TimeField()
 
     service_title = models.CharField(max_length=255)
     service_duration = models.PositiveIntegerField()

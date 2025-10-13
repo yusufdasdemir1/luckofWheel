@@ -169,3 +169,10 @@ class ServiceUpdateSerializer(serializers.ModelSerializer):
             "price": {"required": False},
             "is_active": {"required": False},
         }
+
+
+class MeetingCreateSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=20, help_text="Kayıtlı telefon numarası")
+    service_title = serializers.CharField(max_length=255)
+    date = serializers.DateField()
+    time = serializers.TimeField()
