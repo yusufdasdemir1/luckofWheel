@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from core.models import Meetings
-from core.serializers import MeetingListSerializer
+from core.serializers.meeting_serializers.meeting_serializers import MeetingListSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
-from core.serializers import LoginSerializer
+from core.serializers.company_serializers.auth_serializers import LoginSerializer
 from core.models import Companies,Users
 
 

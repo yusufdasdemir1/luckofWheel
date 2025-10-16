@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from core.serializers import ServiceListSerializer
+from core.serializers.service_serializers.service_serializers import ServiceListSerializer
 
 
 class ServiceCreateView(APIView):

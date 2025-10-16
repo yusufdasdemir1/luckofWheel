@@ -5,6 +5,7 @@ from core.views.company_views.register_view import RegisterView
 
 from core.views.public_views.public_register_view import PublicRegisterView
 from core.views.public_views.public_show_services_view import PublicServiceListView
+from core.views.public_views.public_show_gifts import PublicGiftView
 
 from core.views.company_views.spin_history_view import CompanySpinHistoryView
 from core.views.company_views.update_company_view import CompanyUpdateView
@@ -65,4 +66,6 @@ urlpatterns = [
     path("company/meetings/delete/<int:meeting_id>", MeetingDeleteView.as_view(), name="meeting-delete"),
     path("company/meetings/cancel/<int:meeting_id>", MeetingCancelView.as_view(), name="meeting-cancel"),
     path("meetings/statistics/", MeetingStatisticsView.as_view(), name="meeting-statistics"),
+    path("public/gifts/<slug:slug>/", PublicGiftView.as_view(), name="public_gift_list"),
+
 ]

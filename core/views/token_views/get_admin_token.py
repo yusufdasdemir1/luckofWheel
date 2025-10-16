@@ -3,7 +3,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from core.models import Users
-from core.serializers import AdminTokenObtainPairSerializer
+from core.serializers.company_serializers.auth_serializers import AdminTokenObtainPairSerializer
 
 
 class AdminTokenObtainPairView(TokenObtainPairView):

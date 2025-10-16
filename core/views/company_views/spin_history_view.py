@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from core.models import EarnedWins
-from core.serializers import EarnedWinsSerializer
+from core.serializers.company_serializers.company_serializers import EarnedWinsSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 

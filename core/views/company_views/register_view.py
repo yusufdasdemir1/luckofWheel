@@ -4,7 +4,7 @@ from rest_framework import status
 from django.utils.text import slugify
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from core.serializers import RegisterSerializer
+from core.serializers.company_serializers.auth_serializers import RegisterSerializer
 from core.models import Users, Companies
 from django.db import IntegrityError, transaction
 from django.contrib.auth.hashers import make_password

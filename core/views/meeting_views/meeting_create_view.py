@@ -1,10 +1,10 @@
+from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from core.models import Companies, Users, Meetings, Services
-from core.serializers import MeetingCreateSerializer
-from datetime import datetime, timedelta
+from core.serializers.public_serializers.public_serializers import PublicMeetingCreateSerializer
 from django.utils import timezone
 
 class MeetingCreateView(APIView):
@@ -15,7 +15,7 @@ class MeetingCreateView(APIView):
             "Hizmet süresi `Services` tablosundan otomatik alınır.\n"
             "Randevu bitiş saati (end_time) otomatik hesaplanır ve çakışmalar kontrol edilir."
         ),
-        request_body=MeetingCreateSerializer,
+        request_body=PublicMeetingCreateSerializer,
         responses={
             201: "Randevu oluşturuldu",
             400: "Geçersiz veri, hizmet bulunamadı veya zaman çakışması var",
@@ -30,7 +30,7 @@ class MeetingCreateView(APIView):
         except Companies.DoesNotExist:
             return Response({"error": "Firma bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MeetingCreateSerializer(data=request.data)
+        serializer = PublicMeetingCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         phone=serializer.validated_data["phone"]

@@ -4,7 +4,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from core.models import Companies, Services
-from core.serializers import PublicServiceListSerializer
+from core.serializers.public_serializers.public_serializers import PublicServiceListSerializer
 
 
 class PublicServiceListView(APIView):

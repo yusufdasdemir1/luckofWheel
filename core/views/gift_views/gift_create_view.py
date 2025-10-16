@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from core.serializers import GiftSerializer
+from core.serializers.gift_serializers.gift_serializers import GiftCreateSerializer
 
 
 class GiftCreateView(APIView):
@@ -23,7 +23,7 @@ class GiftCreateView(APIView):
             "**chance:** 0-1 arası oran (%25 için 0.25 yazılır). "
             "Toplam oran hiçbir zaman 1.0'ı geçemez."
         ),
-        request_body=GiftSerializer,
+        request_body=GiftCreateSerializer,
         responses={
             201: openapi.Response(
                 description="Hediye başarıyla oluşturuldu.",
@@ -68,7 +68,7 @@ class GiftCreateView(APIView):
             )
 
         # 🧾 Serializer (context ile!)
-        serializer = GiftSerializer(data=request.data, context={"request": request})
+        serializer = GiftCreateSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

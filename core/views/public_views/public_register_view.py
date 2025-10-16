@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from core.models import Companies, Users, Gifts, EarnedWins
-from core.serializers import PublicRegisterSerializer
+from core.serializers.public_serializers.public_serializers import PublicRegisterSerializer
 import random
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi

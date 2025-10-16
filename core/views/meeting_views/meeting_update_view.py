@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import datetime, timedelta
 from core.models import Meetings, Services
-from core.serializers import MeetingUpdateSerializer
+from core.serializers.meeting_serializers.meeting_serializers import MeetingUpdateSerializer
 
 
 class MeetingUpdateView(APIView):

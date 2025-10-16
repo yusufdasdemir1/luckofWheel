@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from core.models import Gifts
-from core.serializers import GiftDeleteSerializer
+from core.serializers.gift_serializers.gift_serializers import GiftDeleteSerializer
 
 class GiftDeleteView(APIView):
     authentication_classes = [JWTAuthentication]

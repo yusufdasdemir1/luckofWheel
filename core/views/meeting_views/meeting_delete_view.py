@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from core.models import Meetings
-from core.serializers import MeetingDeleteSerializer
+from core.serializers.meeting_serializers.meeting_serializers import MeetingDeleteSerializer
 
 
 class MeetingDeleteView(APIView):

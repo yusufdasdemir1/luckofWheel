@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from core.serializers import CompanyUpdateSerializer
+from core.serializers.company_serializers.company_serializers import CompanyUpdateSerializer
 from core.models import Companies, Users
 from django.utils.text import slugify
 

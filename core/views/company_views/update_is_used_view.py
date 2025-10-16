@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from core.models import EarnedWins
-from core.serializers import EarnedWinStatusSerializer
+from core.serializers.company_serializers.company_serializers import EarnedWinStatusSerializer
 
 
 class EarnedWinStatusUpdateView(APIView):

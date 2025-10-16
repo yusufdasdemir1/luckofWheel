@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from core.models import Services
+from core.serializers.service_serializers.service_serializers import ServiceDeleteSerializer
 
 
 class ServiceDeleteAllView(APIView):
@@ -12,17 +13,17 @@ class ServiceDeleteAllView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="🗑️ Hizmet sil (sadece admin)",
-        operation_description="Admin kendi şirketine ait bir hizmeti tamamen siler.",
+        operation_summary="🗑️ Tüm hizmetleri sil (sadece admin)",
+        operation_description="Admin kendi şirketine ait tüm hizmetleri tamamen siler.",
         responses={
-            200: "Hizmet başarıyla silindi.",
+            200: ServiceDeleteSerializer(many=True),
             403: "Yetkisiz kullanıcı.",
             404: "Hizmet bulunamadı."
         },
         tags=["SERVICES"]
     )
     def delete(self, request):
-        user=request.user
+        user = request.user
 
         if not user.is_admin:
             return Response(
@@ -30,23 +31,26 @@ class ServiceDeleteAllView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        try:
-            services = Services.objects.filter(company=user.company)
-        except Services.DoesNotExist:
+        services = Services.objects.filter(company=user.company)
+
+        if not services.exists():
             return Response(
-                {"error": f"Bu şirkete ait hizmet bulunamadı."},
+                {"error": "Bu şirkete ait hiçbir hizmet bulunamadı."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        deleted_count = services.count()
-        deleted_titles = list(services.values_list("title", flat=True))
+        # 🧾 Silinmeden önce serialize et
+        serializer = ServiceDeleteSerializer(services, many=True)
+        deleted_data = serializer.data
+        deleted_count = len(deleted_data)
+
 
         services.delete()
 
         return Response(
             {
                 "message": f"{deleted_count} hizmet başarıyla silindi.",
-                "deleted_services": deleted_titles
+                "deleted_services": deleted_data
             },
             status=status.HTTP_200_OK
         )
