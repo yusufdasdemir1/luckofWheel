@@ -2,6 +2,7 @@ from django.urls import path
 
 from core.views.company_views.login_view import LoginView
 from core.views.company_views.register_view import RegisterView
+from core.views.company_views.logout_view import LogoutView
 
 from core.views.public_views.public_register_view import PublicRegisterView
 from core.views.public_views.public_show_services_view import PublicServiceListView
@@ -67,5 +68,7 @@ urlpatterns = [
     path("company/meetings/cancel/<int:meeting_id>", MeetingCancelView.as_view(), name="meeting-cancel"),
     path("meetings/statistics/", MeetingStatisticsView.as_view(), name="meeting-statistics"),
     path("public/gifts/<slug:slug>/", PublicGiftView.as_view(), name="public_gift_list"),
+    path("company/logout/", LogoutView.as_view(), name="logout"),
+
 
 ]

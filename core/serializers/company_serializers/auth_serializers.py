@@ -28,3 +28,10 @@ class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise ValueError("Bu işlem sadece admin kullanıcılar içindir.")
         token = super().get_token(user)
         return token
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField(
+        required=True,
+        help_text="Geçerli refresh token (JWT logout için zorunludur)"
+    )
