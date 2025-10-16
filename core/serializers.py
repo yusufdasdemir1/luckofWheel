@@ -92,12 +92,9 @@ class GiftListSerializer(serializers.ModelSerializer):
 
 
 class MeetingListSerializer(serializers.ModelSerializer):
-    user_name=serializers.CharField(source="user.name", read_only=True)
-    user_surname=serializers.CharField(source="user.surname", read_only=True)
-
     class Meta:
         model=Meetings
-        fields=["id","date","time","end_time","is_active","service_title","service_price","user_name","user_surname"]
+        fields=["id","user","date","time","end_time","is_active","service_title","service_price"]
 
 
 class GiftDeleteSerializer(serializers.ModelSerializer):
@@ -200,12 +197,9 @@ class MeetingCancelSerializer(serializers.Serializer):
 
 
 class MeetingDeleteSerializer(serializers.Serializer):
-    user_name=serializers.CharField(source="user.name", read_only=True)
-    user_surname=serializers.CharField(source="user.surname", read_only=True)
-
     class Meta:
         model=Meetings
-        fields=["user_name","user_surname","date","time","end_time","is_active","service_title","service_price"]
+        fields=["user","date","time","end_time","is_active","service_title","service_price"]
 
 
 class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):

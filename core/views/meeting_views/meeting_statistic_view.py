@@ -29,12 +29,12 @@ class MeetingStatisticsView(APIView):
 
         company = user.company
 
-        # 🧾 Temel sayısal istatistikler
+        #Temel sayısal istatistikler
         total_meetings = Meetings.objects.filter(company=company).count()
         active_meetings = Meetings.objects.filter(company=company, is_active=True).count()
         cancelled_meetings = Meetings.objects.filter(company=company, is_active=False).count()
 
-        # 💈 En çok tercih edilen hizmet
+        #En çok tercih edilen hizmet
         top_service = (
             Meetings.objects.filter(company=company)
             .values("service_title")
@@ -43,16 +43,7 @@ class MeetingStatisticsView(APIView):
             .first()
         )
 
-        # 👤 En çok randevu alan müşteri
-        top_user = (
-            Meetings.objects.filter(company=company)
-            .values("user__name", "user__surname")
-            .annotate(total=Count("id"))
-            .order_by("-total")
-            .first()
-        )
-
-        # 💰 Toplam gelir (sadece aktif randevulardan)
+        #Toplam gelir (sadece aktif randevulardan)
         total_income = (
             Meetings.objects.filter(company=company, is_active=True)
             .aggregate(total=Sum("service_price"))["total"] or 0
@@ -66,11 +57,6 @@ class MeetingStatisticsView(APIView):
             "total_income": f"{total_income} ₺",
             "top_service": top_service["service_title"] if top_service else None,
             "top_service_count": top_service["count"] if top_service else 0,
-            "top_user": (
-                f"{top_user['user__name']} {top_user['user__surname']}"
-                if top_user else None
-            ),
-            "top_user_meeting_count": top_user["total"] if top_user else 0,
         }
 
         return Response(data, status=status.HTTP_200_OK)
