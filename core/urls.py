@@ -27,9 +27,17 @@ from core.views.service_views.service_filter_view import ServiceFilterView
 
 from core.views.meeting_views.meeting_create_view import MeetingCreateView
 from core.views.meeting_views.meeting_list_view import MeetingListView
+from core.views.meeting_views.meeting_update_view import MeetingUpdateView
+from core.views.meeting_views.meeting_get_view import MeetingDetailView
+from core.views.meeting_views.meeting_delete_view import MeetingDeleteView
+from core.views.meeting_views.meeting_update_is_active import MeetingCancelView
+from core.views.meeting_views.meeting_statistic_view import MeetingStatisticsView
 
-
+from rest_framework_simplejwt.views import TokenRefreshView
+from core.views.token_views.get_admin_token import AdminTokenObtainPairView
 urlpatterns = [
+    path("api/token/", AdminTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path('company/login/', LoginView.as_view(), name='login'),
     path('company/register/', RegisterView.as_view(), name='register'),
     path("public/register/<slug:slug>/", PublicRegisterView.as_view(), name="public_views"),
@@ -42,14 +50,19 @@ urlpatterns = [
     path("company/gifts/delete-all/", GiftDeleteAllView.as_view(), name="gift_delete_all"),
     path("company/gift/update/<int:gift_id>/", GiftUpdateView.as_view(), name="gift_update"),
     path("company/gift/detail/<int:gift_id>", GiftDetailView.as_view(), name="gift_detail"),
-    path("services/create/", ServiceCreateView.as_view(), name="service-create"),
-    path("services/list/", ServiceListView.as_view(), name="service-list"),
-    path("services/update/<int:service_id>/", ServiceUpdateView.as_view(), name="service-update"),
-    path("services/delete/<int:service_id>/", ServiceDeleteView.as_view(), name="service_delete"),
-    path("services/delete-all/", ServiceDeleteAllView.as_view(), name="service_delete_all"),
-    path("services/<int:service_id>/",ServiceDetailView.as_view(), name="service_detail"),
-    path("services/filter/", ServiceFilterView.as_view(), name="service-filter"),
+    path("company/services/create/", ServiceCreateView.as_view(), name="service-create"),
+    path("company/services/list/", ServiceListView.as_view(), name="service-list"),
+    path("company/services/update/<int:service_id>/", ServiceUpdateView.as_view(), name="service-update"),
+    path("company/services/delete/<int:service_id>/", ServiceDeleteView.as_view(), name="service_delete"),
+    path("company/services/delete-all/", ServiceDeleteAllView.as_view(), name="service_delete_all"),
+    path("company/services/<int:service_id>/",ServiceDetailView.as_view(), name="service_detail"),
+    path("company/services/filter/", ServiceFilterView.as_view(), name="service-filter"),
     path("public/services/<slug:slug>/", PublicServiceListView.as_view(), name="public-services"),
     path("public/meeting/create/<slug:company_slug>/", MeetingCreateView.as_view(), name="meeting-create"),
-    path("public/meeting/list/", MeetingListView.as_view(), name="meeting-list"),
+    path("company/meeting/list/", MeetingListView.as_view(), name="meeting-list"),
+    path("company/meetings/update/<int:meeting_id>", MeetingUpdateView.as_view(), name="meeting-update"),
+    path("company/meetings/detail/<int:meeting_id>", MeetingDetailView.as_view(), name="meeting-detail"),
+    path("company/meetings/delete/<int:meeting_id>", MeetingDeleteView.as_view(), name="meeting-delete"),
+    path("company/meetings/cancel/<int:meeting_id>", MeetingCancelView.as_view(), name="meeting-cancel"),
+    path("meetings/statistics/", MeetingStatisticsView.as_view(), name="meeting-statistics"),
 ]

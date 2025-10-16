@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from core.models import Users, Gifts, EarnedWins, Services, Meetings
 from django.db.models import Sum
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class RegisterSerializer(serializers.Serializer):
     # USER fields
@@ -96,7 +97,7 @@ class MeetingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Meetings
-        fields=["date","time","is_active","service_title","service_price","user_name","user_surname"]
+        fields=["id","date","time","end_time","is_active","service_title","service_price","user_name","user_surname"]
 
 
 class GiftDeleteSerializer(serializers.ModelSerializer):
@@ -185,3 +186,32 @@ class MeetingCreateSerializer(serializers.Serializer):
     service_title = serializers.CharField(max_length=255)
     date = serializers.DateField()
     time = serializers.TimeField()
+
+
+class MeetingUpdateSerializer(serializers.Serializer):
+    note = serializers.CharField(required=False, allow_blank=True)
+    date = serializers.DateField(required=False)
+    time = serializers.TimeField(required=False)
+    service_title = serializers.CharField(required=False, max_length=255)
+
+
+class MeetingCancelSerializer(serializers.Serializer):
+    is_active = serializers.BooleanField(required=True)
+
+
+class MeetingDeleteSerializer(serializers.Serializer):
+    user_name=serializers.CharField(source="user.name", read_only=True)
+    user_surname=serializers.CharField(source="user.surname", read_only=True)
+
+    class Meta:
+        model=Meetings
+        fields=["user_name","user_surname","date","time","end_time","is_active","service_title","service_price"]
+
+
+class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        if not user.is_admin:
+            raise ValueError("Bu işlem sadece admin kullanıcılar içindir.")
+        token = super().get_token(user)
+        return token

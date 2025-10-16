@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
-from core.models import Companies, Users, Meetings, Services
+from core.models import Meetings
 from core.serializers import MeetingListSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -11,6 +11,7 @@ class MeetingListView(APIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(tags=["MEETINGS"])
     def get(self,request):
         user=request.user
