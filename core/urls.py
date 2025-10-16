@@ -26,6 +26,7 @@ from core.views.service_views.service_get_view import ServiceDetailView
 from core.views.service_views.service_filter_view import ServiceFilterView
 
 from core.views.meeting_views.meeting_create_view import MeetingCreateView
+from core.views.meeting_views.meeting_list_view import MeetingListView
 
 
 urlpatterns = [
@@ -50,4 +51,5 @@ urlpatterns = [
     path("services/filter/", ServiceFilterView.as_view(), name="service-filter"),
     path("public/services/<slug:slug>/", PublicServiceListView.as_view(), name="public-services"),
     path("public/meeting/create/<slug:company_slug>/", MeetingCreateView.as_view(), name="meeting-create"),
+    path("public/meeting/list/", MeetingListView.as_view(), name="meeting-list"),
 ]

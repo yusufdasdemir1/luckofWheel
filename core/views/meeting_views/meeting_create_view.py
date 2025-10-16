@@ -21,6 +21,7 @@ class MeetingCreateView(APIView):
             400: "Geçersiz veri, hizmet bulunamadı veya zaman çakışması var",
             404: "Firma veya kullanıcı bulunamadı",
         },
+        tags=["MEETINGS"],
     )
     def post(self, request, company_slug):
         # 1️⃣ Firma kontrolü

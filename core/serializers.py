@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Users, Gifts, EarnedWins, Services
+from core.models import Users, Gifts, EarnedWins, Services, Meetings
 from django.db.models import Sum
 
 class RegisterSerializer(serializers.Serializer):
@@ -88,6 +88,15 @@ class GiftListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gifts
         fields = ["id", "title", "description", "chance", "company_name","is_active"]
+
+
+class MeetingListSerializer(serializers.ModelSerializer):
+    user_name=serializers.CharField(source="user.name", read_only=True)
+    user_surname=serializers.CharField(source="user.surname", read_only=True)
+
+    class Meta:
+        model=Meetings
+        fields=["date","time","is_active","service_title","service_price","user_name","user_surname"]
 
 
 class GiftDeleteSerializer(serializers.ModelSerializer):
