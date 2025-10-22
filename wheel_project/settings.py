@@ -26,7 +26,14 @@ SECRET_KEY = 'django-insecure-5o_6b)_cpnm-rdf9074o9wmu=_@62rcp50+j#sh&iu7l!@nn*4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'tenser-emmanuel-nondefensively.ngrok-free.dev',
+    '.ngrok-free.app',
+    '.ngrok-free.dev'
+]
+
 
 
 # Application definition
@@ -42,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     "rest_framework_simplejwt.token_blacklist",
+    'corsheaders',
 ]
 AUTH_USER_MODEL = 'core.Users'
 
@@ -49,6 +57,7 @@ AUTH_USER_MODEL = 'core.Users'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -157,3 +166,11 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': False,  # Django'nun kendi oturum sistemini devre dışı bırakır
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.ngrok-free.app",
+    "https://*.ngrok-free.dev",
+]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
