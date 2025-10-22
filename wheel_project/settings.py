@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-
+from dotenv import load_dotenv
+import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,14 +23,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5o_6b)_cpnm-rdf9074o9wmu=_@62rcp50+j#sh&iu7l!@nn*4'
+load_dotenv(BASE_DIR / ".env")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+def env_bool(name, default=False):
+    val = os.getenv(name)
+    if val is None:
+        return default
+    return val.lower() in ("1", "true", "yes", "on")
 
-ALLOWED_HOSTS = [
-    '164.90.183.200',
-]
+def env_list(name, default=""):
+    raw = os.getenv(name, default)
+    return [x.strip() for x in raw.split(",") if x.strip()]
+
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+DEBUG = env_bool("DEBUG", False)
+
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "")
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", "")
 
 
 
@@ -85,16 +95,11 @@ WSGI_APPLICATION = 'wheel_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'wheel_db',
-        'USER': 'yusufdasdemir',
-        'PASSWORD': '1596321as',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    "default": dj_database_url.parse(
+        os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        conn_max_age=600,
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -166,8 +171,5 @@ SWAGGER_SETTINGS = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.ngrok-free.app",
-    "https://*.ngrok-free.dev",
-]
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
