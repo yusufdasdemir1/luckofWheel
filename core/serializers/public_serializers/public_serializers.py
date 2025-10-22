@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Users, Services, Gifts
+from core.models import Users, Services, Gifts, Meetings
 
 
 class PublicRegisterSerializer(serializers.ModelSerializer):
@@ -26,3 +26,13 @@ class GiftPublicListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gifts
         fields = ["title"]
+
+
+class MeetingOccupiedSerializer(serializers.ModelSerializer):
+    date = serializers.DateField(format="%Y-%m-%d")
+    time = serializers.TimeField(format="%H:%M")
+    end_time = serializers.TimeField(format="%H:%M")
+
+    class Meta:
+        model = Meetings
+        fields = ["date", "time", "end_time"]

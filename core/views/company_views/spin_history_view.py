@@ -48,7 +48,7 @@ class CompanySpinHistoryView(APIView):
             return Response({"error": "Bu işlem için yetkiniz yok."},status=status.HTTP_403_FORBIDDEN)
 
         #Kendi firmasına ait veriler
-        queryset=EarnedWins.objects.filter(company=user.company)
+        queryset=EarnedWins.objects.filter(company=user.company).select_related("user")
 
         user_id=request.query_params.get('user_id')
         is_used=request.query_params.get('is_used')

@@ -7,6 +7,7 @@ from core.views.company_views.logout_view import LogoutView
 from core.views.public_views.public_register_view import PublicRegisterView
 from core.views.public_views.public_show_services_view import PublicServiceListView
 from core.views.public_views.public_show_gifts import PublicGiftView
+from core.views.public_views.public_show_available_meetings import PublicOccupiedMeetingsView
 
 from core.views.company_views.spin_history_view import CompanySpinHistoryView
 from core.views.company_views.update_company_view import CompanyUpdateView
@@ -69,6 +70,5 @@ urlpatterns = [
     path("meetings/statistics/", MeetingStatisticsView.as_view(), name="meeting-statistics"),
     path("public/gifts/<slug:slug>/", PublicGiftView.as_view(), name="public_gift_list"),
     path("company/logout/", LogoutView.as_view(), name="logout"),
-
-
+    path("public/occupied-meetings/<slug>/",PublicOccupiedMeetingsView.as_view(), name="public-occupied-meetings"),
 ]

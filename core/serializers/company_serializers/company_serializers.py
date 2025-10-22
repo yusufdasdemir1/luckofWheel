@@ -3,9 +3,11 @@ from core.models import EarnedWins
 
 
 class EarnedWinsSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source="user.name", read_only=True)
+    user_surname = serializers.CharField(source="user.surname", read_only=True)
     class Meta:
         model = EarnedWins
-        fields = ["id","user","gift_title","is_used", "created_at"]
+        fields = ["id","user_name","user_surname","gift_title","is_used", "created_at"]
 
 
 class EarnedWinStatusSerializer(serializers.Serializer):
