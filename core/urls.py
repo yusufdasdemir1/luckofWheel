@@ -3,15 +3,17 @@ from django.urls import path
 from core.views.company_views.login_view import LoginView
 from core.views.company_views.register_view import RegisterView
 from core.views.company_views.logout_view import LogoutView
+from core.views.company_views.spin_history_view import CompanySpinHistoryView
+from core.views.company_views.update_company_view import CompanyUpdateView
+from core.views.company_views.update_is_used_view import EarnedWinStatusUpdateView
+from core.views.company_views.my_information_view import MeView
+
 
 from core.views.public_views.public_register_view import PublicRegisterView
 from core.views.public_views.public_show_services_view import PublicServiceListView
 from core.views.public_views.public_show_gifts import PublicGiftView
 from core.views.public_views.public_show_available_meetings import PublicOccupiedMeetingsView
 
-from core.views.company_views.spin_history_view import CompanySpinHistoryView
-from core.views.company_views.update_company_view import CompanyUpdateView
-from core.views.company_views.update_is_used_view import EarnedWinStatusUpdateView
 
 from core.views.gift_views.gift_list_view import GiftListView
 from core.views.gift_views.gift_delete_view import GiftDeleteView
@@ -19,6 +21,7 @@ from core.views.gift_views.gift_delete_all_view import GiftDeleteAllView
 from core.views.gift_views.gift_update_view import GiftUpdateView
 from core.views.gift_views.gift_get_view import GiftDetailView
 from core.views.gift_views.gift_create_view import GiftCreateView
+
 
 from core.views.service_views.service_create_view import ServiceCreateView
 from core.views.service_views.service_list_view import ServiceListView
@@ -28,6 +31,7 @@ from core.views.service_views.service_delete_all_view import ServiceDeleteAllVie
 from core.views.service_views.service_get_view import ServiceDetailView
 from core.views.service_views.service_filter_view import ServiceFilterView
 
+
 from core.views.meeting_views.meeting_create_view import MeetingCreateView
 from core.views.meeting_views.meeting_list_view import MeetingListView
 from core.views.meeting_views.meeting_update_view import MeetingUpdateView
@@ -35,6 +39,7 @@ from core.views.meeting_views.meeting_get_view import MeetingDetailView
 from core.views.meeting_views.meeting_delete_view import MeetingDeleteView
 from core.views.meeting_views.meeting_update_is_active import MeetingCancelView
 from core.views.meeting_views.meeting_statistic_view import MeetingStatisticsView
+
 
 from rest_framework_simplejwt.views import TokenRefreshView
 from core.views.token_views.get_admin_token import AdminTokenObtainPairView
@@ -71,4 +76,5 @@ urlpatterns = [
     path("public/gifts/<slug:slug>/", PublicGiftView.as_view(), name="public_gift_list"),
     path("company/logout/", LogoutView.as_view(), name="logout"),
     path("public/occupied-meetings/<slug>/",PublicOccupiedMeetingsView.as_view(), name="public-occupied-meetings"),
+    path("me/", MeView.as_view(), name="me"),
 ]

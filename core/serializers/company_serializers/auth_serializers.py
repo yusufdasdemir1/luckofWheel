@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from core.models import Users,Companies
 
 class RegisterSerializer(serializers.Serializer):
     # USER fields
@@ -35,3 +36,17 @@ class LogoutSerializer(serializers.Serializer):
         required=True,
         help_text="Geçerli refresh token (JWT logout için zorunludur)"
     )
+
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Companies
+        fields = ["id", "title", "description", "phone", "email", "slug", "logo", "thumbnail"]
+
+
+class UserSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)  # 🔹 company bilgilerini iç içe dahil ediyoruz
+
+    class Meta:
+        model = Users
+        fields = ["id", "name", "surname","company"]
