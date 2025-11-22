@@ -143,3 +143,28 @@ class Services(models.Model):
 
     def __str__(self):
         return f"{self.title} ({'Aktif' if self.is_active else 'Pasif'})"
+
+
+LOG_LEVELS = (
+    ("INFO", "INFO"),
+    ("WARNING", "WARNING"),
+    ("ERROR", "ERROR"),
+)
+
+
+class APILog(models.Model):
+    log_level = models.CharField(max_length=20, choices=LOG_LEVELS, default="INFO")
+
+    path = models.CharField(max_length=200)
+    method = models.CharField(max_length=10)
+    status = models.IntegerField()
+    ip = models.CharField(max_length=100)
+    duration = models.FloatField()
+
+    request_body = models.TextField(null=True, blank=True)
+    response_body = models.TextField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.method} {self.path} [{self.status}]"
