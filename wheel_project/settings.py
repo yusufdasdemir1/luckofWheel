@@ -158,7 +158,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+
 SWAGGER_SETTINGS = {
+    'DEFAULT_API_URL': API_BASE_URL,
+
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
