@@ -5,9 +5,10 @@ from core.models import  Meetings
 class MeetingListSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.name", read_only=True)
     user_surname = serializers.CharField(source="user.surname", read_only=True)
+    user_phone = serializers.CharField(source="user.phone", read_only=True)
     class Meta:
         model=Meetings
-        fields=["id","user_name","user_surname","date","time","end_time","is_active","service_title","service_price"]
+        fields=["id","user_name","user_surname","user_phone","date","time","end_time","is_active","service_title","service_price"]
 
 
 class MeetingUpdateSerializer(serializers.Serializer):
