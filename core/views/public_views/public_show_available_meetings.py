@@ -2,7 +2,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from core.models import Companies, Meetings
+from core.models import Companies, Meetings, MeetingStatus
 from core.serializers.public_serializers.public_serializers import MeetingOccupiedSerializer
 from drf_yasg import openapi
 
@@ -39,7 +39,7 @@ class PublicOccupiedMeetingsView(APIView):
             return Response({"error": "Firma bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
 
         # Şirkete ait aktif randevular
-        meetings = Meetings.objects.filter(company=company, is_active=True)
+        meetings = Meetings.objects.filter(company=company, status__in=[MeetingStatus.WAITING, MeetingStatus.ARRIVED])
 
         serializer = MeetingOccupiedSerializer(meetings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

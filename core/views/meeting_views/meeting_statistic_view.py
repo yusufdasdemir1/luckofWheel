@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from core.models import Meetings
+from core.models import Meetings,MeetingStatus
 from django.db.models import Count, Sum
 
 
@@ -31,8 +31,20 @@ class MeetingStatisticsView(APIView):
 
         #Temel sayısal istatistikler
         total_meetings = Meetings.objects.filter(company=company).count()
-        active_meetings = Meetings.objects.filter(company=company, is_active=True).count()
-        cancelled_meetings = Meetings.objects.filter(company=company, is_active=False).count()
+        waiting_meetings = Meetings.objects.filter(
+            company=company,
+            status=MeetingStatus.WAITING
+        ).count()
+
+        cancelled_meetings = Meetings.objects.filter(
+            company=company,
+            status=MeetingStatus.CANCELED
+        ).count()
+
+        arrived_meetings = Meetings.objects.filter(
+            company=company,
+            status=MeetingStatus.ARRIVED
+        ).count()
 
         #En çok tercih edilen hizmet
         top_service = (
@@ -45,16 +57,18 @@ class MeetingStatisticsView(APIView):
 
         #Toplam gelir (sadece aktif randevulardan)
         total_income = (
-            Meetings.objects.filter(company=company, is_active=True)
+            Meetings.objects.filter(company=company, status=MeetingStatus.ARRIVED)
             .aggregate(total=Sum("service_price"))["total"] or 0
         )
 
-        # ✅ Response
+        #Response
         data = {
             "total_meetings": total_meetings,
-            "active_meetings": active_meetings,
+            "waiting_meetings": waiting_meetings,
+            "arrived_meetings": arrived_meetings,
             "cancelled_meetings": cancelled_meetings,
             "total_income": f"{total_income} ₺",
+
             "top_service": top_service["service_title"] if top_service else None,
             "top_service_count": top_service["count"] if top_service else 0,
         }

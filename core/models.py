@@ -108,10 +108,22 @@ class EarnedWins(models.Model):
         return f"{self.user.name} - {self.gift.title}"
 
 
+class MeetingStatus(models.TextChoices):
+    WAITING = "waiting", "Bekliyor"
+    ARRIVED = "arrived", "Geldi"
+    CANCELED = "canceled", "İptal"
+
+
 class Meetings(models.Model):
     date = models.DateField()
     time = models.TimeField()
     end_time = models.TimeField()
+
+    status=models.CharField(
+        max_length=20,
+        choices=MeetingStatus.choices,
+        default=MeetingStatus.WAITING,
+    )
 
     service_title = models.CharField(max_length=255)
     service_duration = models.PositiveIntegerField()
@@ -121,7 +133,7 @@ class Meetings(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='meetings')
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='meetings')
 
-    is_active = models.BooleanField(default=True, help_text="Randevu geçerli mi?")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

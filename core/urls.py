@@ -37,7 +37,7 @@ from core.views.meeting_views.meeting_list_view import MeetingListView
 from core.views.meeting_views.meeting_update_view import MeetingUpdateView
 from core.views.meeting_views.meeting_get_view import MeetingDetailView
 from core.views.meeting_views.meeting_delete_view import MeetingDeleteView
-from core.views.meeting_views.meeting_update_is_active import MeetingCancelView
+from core.views.meeting_views.meeting_update_is_status import MeetingCancelView
 from core.views.meeting_views.meeting_statistic_view import MeetingStatisticsView
 
 

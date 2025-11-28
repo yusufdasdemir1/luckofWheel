@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from core.models import Meetings
+from core.models import Meetings,MeetingStatus
 from core.serializers.meeting_serializers.meeting_serializers import MeetingCancelSerializer
 
 
@@ -45,17 +45,19 @@ class MeetingCancelView(APIView):
         serializer = MeetingCancelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        is_active = serializer.validated_data["is_active"]
+        meeting_status = serializer.validated_data["status"]
 
         # 🔁 Durumu güncelle
-        meeting.is_active = is_active
+        meeting.status = meeting_status
         meeting.save()
+
+        readable_status = dict(MeetingStatus.choices).get(meeting_status)
 
         return Response(
             {
-                "message": f"Randevu durumu başarıyla {'aktif' if is_active else 'iptal'} olarak güncellendi.",
+                "message": f"Randevu durumu başarıyla '{readable_status}' olarak güncellendi.",
                 "meeting_id": meeting.id,
-                "is_active": meeting.is_active,
+                "status": meeting.status,
             },
             status=status.HTTP_200_OK
         )

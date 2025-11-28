@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from core.models import  Meetings
+from core.models import MeetingStatus
 
 
 class MeetingListSerializer(serializers.ModelSerializer):
@@ -8,7 +9,7 @@ class MeetingListSerializer(serializers.ModelSerializer):
     user_phone = serializers.CharField(source="user.phone", read_only=True)
     class Meta:
         model=Meetings
-        fields=["id","user_name","user_surname","user_phone","date","time","end_time","is_active","service_title","service_price"]
+        fields=["id","user_name","user_surname","user_phone","date","time","end_time","status","note","service_title","service_price"]
 
 
 class MeetingUpdateSerializer(serializers.Serializer):
@@ -19,10 +20,13 @@ class MeetingUpdateSerializer(serializers.Serializer):
 
 
 class MeetingCancelSerializer(serializers.Serializer):
-    is_active = serializers.BooleanField(required=True)
+    status=serializers.ChoiceField(
+        choices=MeetingStatus.values,
+        required=True,
+    )
 
 
 class MeetingDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model=Meetings
-        fields=["user","date","time","end_time","is_active","service_title","service_price"]
+        fields=["user","date","time","end_time","status","service_title","service_price"]
