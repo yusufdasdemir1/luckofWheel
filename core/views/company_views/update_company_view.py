@@ -8,6 +8,7 @@ from core.serializers.company_serializers.company_serializers import CompanyUpda
 from core.models import Companies, Users
 from django.utils.text import slugify
 
+
 class CompanyUpdateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -25,13 +26,14 @@ class CompanyUpdateView(APIView):
     def patch(self, request, company_slug):
         user = request.user
 
+
         if not user.is_admin:
             return Response(
                 {"error": "Bu işlem sadece admin kullanıcılar içindir."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 🔎 Firma slug'ına göre getir
+        # Firma bul
         try:
             company = Companies.objects.get(slug=company_slug)
         except Companies.DoesNotExist:
@@ -40,32 +42,33 @@ class CompanyUpdateView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # 🧩 Sadece kendi firmasını güncelleyebilsin
+        # Sadece kendi şirketini güncelleyebilir
         if company != user.company:
             return Response(
                 {"error": "Kendi firmanız dışında işlem yapamazsınız."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # ✅ Verileri işle
+        # Veriyi doğrula
         serializer = CompanyUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        # Alanları güncelle
         for field, value in serializer.validated_data.items():
             setattr(company, field, value)
 
+        # Title değişirse slug güncelle
         if "title" in serializer.validated_data:
             company.slug = slugify(serializer.validated_data["title"])
 
         company.save()
 
-        # 🔁 Eğer e-posta değiştiyse admin kullanıcının e-postasını da güncelle
+        # Admin e-posta güncellemesi
         if "email" in serializer.validated_data:
             new_email = serializer.validated_data["email"]
             Users.objects.filter(company=company, is_admin=True).update(email=new_email)
 
-
-
+        # Response
         return Response(
             {
                 "message": "Şirket bilgileri başarıyla güncellendi.",
@@ -77,6 +80,10 @@ class CompanyUpdateView(APIView):
                     "is_show_wheel": company.is_show_wheel,
                     "show_before_meeting": company.show_before_meeting,
                     "spin_cooldown_hours": company.spin_cooldown_hours,
+                    "logo": company.logo,
+                    "thumbnail": company.thumbnail,
+                    "address_text": company.address_text,
+                    "embed_address": company.embed_address,
                 }
             },
             status=status.HTTP_200_OK

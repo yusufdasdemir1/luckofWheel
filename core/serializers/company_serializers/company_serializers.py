@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core.models import EarnedWins
-
+from core.exceptions import SimpleError
 
 class EarnedWinsSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.name", read_only=True)
@@ -20,5 +20,28 @@ class CompanyUpdateSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     phone = serializers.CharField(required=False)
     show_before_meeting = serializers.BooleanField(required=False)
+    logo=serializers.CharField(required=False)
+    thumbnail=serializers.CharField(required=False)
+    address_text=serializers.CharField(required=False)
+    embed_address=serializers.CharField(required=False)
     is_show_wheel = serializers.BooleanField(required=False)
     spin_cooldown_hours=serializers.IntegerField(required=False,min_value=1)
+    company_color= serializers.CharField(required=False)
+
+    allowed_extensions = ["png", "jpg", "jpeg", "webp"]
+
+    def validate(self, attrs):
+
+        logo = attrs.get("logo")
+        if logo:
+            ext = logo.split(".")[-1].lower()
+            if ext not in self.allowed_extensions:
+                raise SimpleError(f"Logo için izin verilen uzantılar: {', '.join(self.allowed_extensions)}")
+
+        thumbnail = attrs.get("thumbnail")
+        if thumbnail:
+            ext = thumbnail.split(".")[-1].lower()
+            if ext not in self.allowed_extensions:
+                raise SimpleError(f"Thumbnail için izin verilen uzantılar: {', '.join(self.allowed_extensions)}")
+
+        return attrs

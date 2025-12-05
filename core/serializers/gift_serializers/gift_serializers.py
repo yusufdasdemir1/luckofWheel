@@ -36,7 +36,7 @@ class GiftCreateSerializer(serializers.ModelSerializer):
 class GiftListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gifts
-        fields = ["id", "title", "description", "chance", "is_active"]
+        fields = ["id", "title", "description", "chance", "is_active","gift_color"]
 
 
 class GiftDeleteSerializer(serializers.ModelSerializer):
@@ -48,12 +48,13 @@ class GiftDeleteSerializer(serializers.ModelSerializer):
 class GiftUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gifts
-        fields = ["title", "description", "chance","is_active"]
+        fields = ["title", "description", "chance","is_active","gift_color"]
         extra_kwargs = {
             "title": {"required": False},
             "description": {"required": False},
             "chance": {"required": False},
             "is_active":{"required": False},
+            "gift_color": {"required": False}
         }
 
     def validate(self, data):

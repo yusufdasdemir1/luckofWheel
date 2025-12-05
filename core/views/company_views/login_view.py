@@ -34,6 +34,16 @@ class LoginView(APIView):
             )
 
 
+        if company.status!='active':
+            return Response(
+                {
+                    "error": "Firmanız ödeme yapılmadığı için pasif durumdadır."
+                             " Hesabınızı yeniden aktif etmek için lütfen cevirkazan360@gmail.com adresine e-posta gönderin."
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+
         try:
             user = Users.objects.get(company=company, is_admin=True)
         except Users.DoesNotExist:

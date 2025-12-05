@@ -43,6 +43,9 @@ CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", "")
 
 
 
+PUBLIC_ROOT = os.path.join(BASE_DIR, "public", "images")
+PUBLIC_URL = "/public/images/"
+
 # Application definition
 
 INSTALLED_APPS = [

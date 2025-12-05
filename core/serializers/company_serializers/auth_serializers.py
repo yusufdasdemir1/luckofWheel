@@ -41,7 +41,8 @@ class LogoutSerializer(serializers.Serializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Companies
-        fields = ["id", "title", "description", "phone", "email", "slug","is_show_wheel","show_before_meeting","spin_cooldown_hours", "logo", "thumbnail"]
+        fields = ["id", "title", "description", "phone", "email", "slug","is_show_wheel","show_before_meeting","spin_cooldown_hours",
+                  "logo", "thumbnail","embed_address","address_text","status","company_color"]
 
 
 class UserSerializer(serializers.ModelSerializer):

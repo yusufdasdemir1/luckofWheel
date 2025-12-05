@@ -2,16 +2,26 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class Companies(models.Model):
+    STATUS_CHOICES = (
+        ('active', 'Aktif'),
+        ('passive', 'Pasif'),
+    )
+
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=20,unique=True)
     email = models.EmailField(unique=True)
-    logo = models.ImageField(upload_to='logos/', blank=True, null=True)
-    thumbnail = models.CharField(max_length=255, blank=True, null=True)
+    logo = models.CharField(max_length=255, blank=True, default="")
+    thumbnail = models.CharField(max_length=255, blank=True, default="")
     slug = models.SlugField(unique=True)
     is_show_wheel = models.BooleanField(default=True)
     show_before_meeting = models.BooleanField(default=False)
     spin_cooldown_hours=models.PositiveIntegerField(default=48)
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    address_text = models.TextField(blank=True, null=False, default='')
+    embed_address = models.TextField(blank=True, null=False,default='')
+    company_color = models.CharField(blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -83,6 +93,7 @@ class Gifts(models.Model):
     chance = models.FloatField(help_text="Ödülün çıkma olasılığı (0-1 arası değer)")
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='gifts')
     is_active = models.BooleanField(default=True, help_text="Bu hediye şu anda aktif mi?")
+    gift_color=models.CharField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
