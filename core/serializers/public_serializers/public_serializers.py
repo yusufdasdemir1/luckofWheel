@@ -25,7 +25,7 @@ class PublicMeetingCreateSerializer(serializers.Serializer):
 class GiftPublicListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gifts
-        fields = ["title"]
+        fields = ["title","chance","gift_color"]
 
 
 class MeetingOccupiedSerializer(serializers.ModelSerializer):

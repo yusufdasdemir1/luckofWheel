@@ -75,7 +75,7 @@ class GiftListView(APIView):
         if not gift_list.exists():
             return Response(
                 {"message":"Sisteminize ait herhangi bir hediye bulunamadı."},
-                status=status.HTTP_200_OK
+                status=status.HTTP_404_NOT_FOUND
             )
 
         serializer = GiftListSerializer(gift_list, many=True)

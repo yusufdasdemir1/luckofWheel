@@ -41,7 +41,7 @@ class PublicServiceListView(APIView):
 
         if not services.exists():
             return Response(
-                {"message": "Bu firmaya ait aktif hizmet bulunamadı."},
+                [],
                 status=status.HTTP_200_OK
             )
 

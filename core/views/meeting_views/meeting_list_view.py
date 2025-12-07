@@ -24,7 +24,7 @@ class MeetingListView(APIView):
         meetings_list=Meetings.objects.filter(company=user.company).select_related("company","user").order_by('-date', '-time')
 
         if not meetings_list:
-            return Response({"message":"firmanıza ait randevu bulunmamakta."},status=status.HTTP_200_OK)
+            return Response({"message":"firmanıza ait randevu bulunmamakta."},status=status.HTTP_404_NOT_FOUND)
 
         serializer=MeetingListSerializer(meetings_list,many=True)
 

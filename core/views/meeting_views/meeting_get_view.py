@@ -25,7 +25,8 @@ class MeetingDetailView(APIView):
 
         if not meeting:
             return Response(
-                {"message":f"meeting id {meeting_id} not exist"},
+                {"message":f"{meeting_id} id'li toplantı bulunamadı"},
+                status=status.HTTP_404_NOT_FOUND
             )
 
         serializer=MeetingListSerializer(meeting)

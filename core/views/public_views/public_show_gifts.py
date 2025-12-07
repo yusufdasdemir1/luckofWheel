@@ -32,7 +32,7 @@ class PublicGiftView(APIView):
 
         if not gifts.exists():
             return Response(
-                {"message": "Bu firmaya ait aktif hediye bulunmamaktadır."},
+                [],
                 status=status.HTTP_200_OK
             )
 

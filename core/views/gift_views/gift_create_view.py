@@ -64,7 +64,7 @@ class GiftCreateView(APIView):
         if not user.company:
             return Response(
                 {"error": "Kullanıcının bağlı olduğu bir firma bulunamadı."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
             )
 
         # 🧾 Serializer (context ile!)

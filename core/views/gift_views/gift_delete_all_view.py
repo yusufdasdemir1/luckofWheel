@@ -65,7 +65,7 @@ class GiftDeleteAllView(APIView):
         if not gifts.exists():
             return Response(
                 {"message": "Sistemde silinecek hediye bulunamadı."},
-                status=status.HTTP_200_OK,
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         # 🔥 Silme işlemi

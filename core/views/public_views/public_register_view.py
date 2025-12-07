@@ -132,7 +132,7 @@ class PublicRegisterView(APIView):
         # 🎁 Rastgele ödül seçimi
         gifts = Gifts.objects.filter(company=company,is_active=True)
         if not gifts.exists():
-            return Response({"error": "Bu firmaya ait hediye tanımlı değil."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response([], status=status.HTTP_200_OK)
 
         total_chance = sum(g.chance for g in gifts)
         rand = random.uniform(0, total_chance)
