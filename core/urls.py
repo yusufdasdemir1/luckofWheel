@@ -14,6 +14,7 @@ from core.views.public_views.public_show_services_view import PublicServiceListV
 from core.views.public_views.public_show_gifts import PublicGiftView
 from core.views.public_views.public_show_available_meetings import PublicOccupiedMeetingsView
 from core.views.public_views.public_show_companies import ShowCompaniesView
+from core.views.public_views.public_show_company_detail import PublicCompanyDetailView
 
 
 from core.views.gift_views.gift_list_view import GiftListView
@@ -79,4 +80,5 @@ urlpatterns = [
     path("public/occupied-meetings/<slug>",PublicOccupiedMeetingsView.as_view(), name="public-occupied-meetings"),
     path("public/companies", ShowCompaniesView.as_view(), name="show_companies"),
     path("company/me", MeView.as_view(), name="me"),
+    path("public/companies/<slug:slug>", PublicCompanyDetailView.as_view(), name="show_companies"),
 ]

@@ -42,3 +42,18 @@ class ShowCompaniesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Companies
         fields=["title","description","phone","slug","city","district","logo"]
+
+
+class PublicCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Companies
+        fields = [
+            "title",
+            "description",
+            "phone",
+            "email",
+            "slug",
+            "address_text",
+            "city",
+            "district",
+        ]
