@@ -54,6 +54,7 @@ class PublicCompanySerializer(serializers.ModelSerializer):
             "email",
             "slug",
             "address_text",
+            "embed_address",
             "city",
             "district",
         ]
