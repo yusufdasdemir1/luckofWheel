@@ -57,4 +57,5 @@ class PublicCompanySerializer(serializers.ModelSerializer):
             "embed_address",
             "city",
             "district",
+            "logo"
         ]
