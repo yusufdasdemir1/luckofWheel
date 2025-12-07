@@ -15,6 +15,10 @@ class EarnedWinStatusSerializer(serializers.Serializer):
 
 
 class CompanyUpdateSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False)
+    phone = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+
     class Meta:
         model=Companies
         exclude=["slug","created_at","updated_at","status"]
