@@ -41,4 +41,4 @@ class MeetingOccupiedSerializer(serializers.ModelSerializer):
 class ShowCompaniesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Companies
-        fields=["title","description","phone","slug","city","district"]
+        fields=["title","description","phone","slug","city","district","logo"]

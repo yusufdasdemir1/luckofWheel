@@ -77,6 +77,6 @@ urlpatterns = [
     path("public/gifts/<slug:slug>", PublicGiftView.as_view(), name="public_gift_list"),
     path("company/logout", LogoutView.as_view(), name="logout"),
     path("public/occupied-meetings/<slug>",PublicOccupiedMeetingsView.as_view(), name="public-occupied-meetings"),
-    path("public/show-companies", ShowCompaniesView.as_view(), name="show_companies"),
+    path("public/companies", ShowCompaniesView.as_view(), name="show_companies"),
     path("company/me", MeView.as_view(), name="me"),
 ]
