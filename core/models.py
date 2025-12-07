@@ -21,6 +21,8 @@ class Companies(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
     address_text = models.TextField(blank=True, null=False, default='')
     embed_address = models.TextField(blank=True, null=False,default='')
+    city=models.TextField(blank=True, null=False, default='')
+    district=models.TextField(blank=True, null=False, default='')
     company_color = models.CharField(blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)

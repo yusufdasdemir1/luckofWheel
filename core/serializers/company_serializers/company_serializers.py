@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import EarnedWins
+from core.models import EarnedWins,Companies
 from core.exceptions import SimpleError
 
 class EarnedWinsSerializer(serializers.ModelSerializer):
@@ -14,19 +14,10 @@ class EarnedWinStatusSerializer(serializers.Serializer):
     is_used = serializers.BooleanField(required=True, help_text="Ödül kullanıldı mı (true/false)")
 
 
-class CompanyUpdateSerializer(serializers.Serializer):
-    title = serializers.CharField(required=False, max_length=255)
-    description = serializers.CharField(required=False, allow_blank=True)
-    email = serializers.EmailField(required=False)
-    phone = serializers.CharField(required=False)
-    show_before_meeting = serializers.BooleanField(required=False)
-    logo=serializers.CharField(required=False)
-    thumbnail=serializers.CharField(required=False)
-    address_text=serializers.CharField(required=False)
-    embed_address=serializers.CharField(required=False)
-    is_show_wheel = serializers.BooleanField(required=False)
-    spin_cooldown_hours=serializers.IntegerField(required=False,min_value=1)
-    company_color= serializers.CharField(required=False)
+class CompanyUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Companies
+        exclude=["slug","created_at","updated_at","status"]
 
     allowed_extensions = ["png", "jpg", "jpeg", "webp"]
 
@@ -45,3 +36,9 @@ class CompanyUpdateSerializer(serializers.Serializer):
                 raise SimpleError(f"Thumbnail için izin verilen uzantılar: {', '.join(self.allowed_extensions)}")
 
         return attrs
+
+
+class CompanyResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Companies
+        exclude = ["slug", "created_at", "updated_at", "status"]

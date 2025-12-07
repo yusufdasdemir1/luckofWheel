@@ -4,7 +4,6 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from core.models import Companies, Gifts
 from core.serializers.public_serializers.public_serializers import GiftPublicListSerializer
-from rest_framework.permissions import AllowAny
 
 
 class PublicGiftView(APIView):

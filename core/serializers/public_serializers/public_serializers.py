@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Users, Services, Gifts, Meetings
+from core.models import Users, Services, Gifts, Meetings, Companies
 
 
 class PublicRegisterSerializer(serializers.ModelSerializer):
@@ -36,3 +36,9 @@ class MeetingOccupiedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meetings
         fields = ["date", "time", "end_time"]
+
+
+class ShowCompaniesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Companies
+        fields=["title","description","phone","slug","city","district"]

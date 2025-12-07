@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from core.serializers.company_serializers.company_serializers import CompanyUpdateSerializer
+from core.serializers.company_serializers.company_serializers import CompanyUpdateSerializer,CompanyResponseSerializer
 from core.models import Companies, Users
 from django.utils.text import slugify
 
@@ -68,23 +68,12 @@ class CompanyUpdateView(APIView):
             new_email = serializer.validated_data["email"]
             Users.objects.filter(company=company, is_admin=True).update(email=new_email)
 
+        response_serializer = CompanyResponseSerializer(company)
         # Response
         return Response(
             {
                 "message": "Şirket bilgileri başarıyla güncellendi.",
-                "company": {
-                    "title": company.title,
-                    "description": company.description,
-                    "email": company.email,
-                    "phone": company.phone,
-                    "is_show_wheel": company.is_show_wheel,
-                    "show_before_meeting": company.show_before_meeting,
-                    "spin_cooldown_hours": company.spin_cooldown_hours,
-                    "logo": company.logo,
-                    "thumbnail": company.thumbnail,
-                    "address_text": company.address_text,
-                    "embed_address": company.embed_address,
-                }
+                "company": response_serializer.data
             },
             status=status.HTTP_200_OK
         )
