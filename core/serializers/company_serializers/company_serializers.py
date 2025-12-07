@@ -14,6 +14,14 @@ class EarnedWinStatusSerializer(serializers.Serializer):
     is_used = serializers.BooleanField(required=True, help_text="Ödül kullanıldı mı (true/false)")
 
 
+class EarnedWinSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source="gift_title", read_only=True)
+    description = serializers.CharField(source="gift_description", read_only=True)
+
+    class Meta:
+        model = EarnedWins
+        fields = ["id", "title", "description"]
+
 class CompanyUpdateSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
     phone = serializers.CharField(required=False)
