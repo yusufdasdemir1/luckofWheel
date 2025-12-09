@@ -64,6 +64,7 @@ class MeetingCreateView(APIView):
             date=date,
             time__lt=end_time,
             end_time__gt=time,
+            status__in=["waiting","arrived"]
         ).exists()
 
         if overlap_exists:
