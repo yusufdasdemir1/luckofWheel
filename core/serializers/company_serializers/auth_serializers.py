@@ -11,7 +11,9 @@ class RegisterSerializer(serializers.Serializer):
     # COMPANY fields
     company_title = serializers.CharField(max_length=255,required=True)
     company_description = serializers.CharField(required=False, allow_blank=True)
-    company_email = serializers.EmailField(required=True)
+    company_email = serializers.EmailField(required=True,
+                                           error_messages={"invalid": "Geçerli bir email adresi giriniz."}
+                                           )
     company_phone = serializers.CharField(required=True)
     show_before_meeting = serializers.BooleanField(default=False)
     is_show_wheel = serializers.BooleanField(default=True)

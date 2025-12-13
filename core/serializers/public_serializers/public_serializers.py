@@ -1,12 +1,38 @@
 from rest_framework import serializers
-
+import re
 from core.models import Users, Services, Gifts, Meetings, Companies
 
 
+PHONE_RE = re.compile(r'^\+90\d{10}$')
+
 class PublicRegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        error_messages={"invalid": "Geçerli bir email adresi giriniz."}
+    )
+    phone = serializers.CharField()
+
     class Meta:
         model = Users
-        fields = ('name', 'surname', 'email','phone')
+        fields = ('name', 'surname', 'email', 'phone')
+
+    def validate_email(self, value):
+        value = value.strip().lower()
+        domain = value.split("@")[-1]
+
+        # internet maili kuralı
+        if "." not in domain:
+            raise serializers.ValidationError(
+                "Email adresi geçerli bir alan adı içermelidir (ör: example.com)."
+            )
+        return value
+
+    def validate_phone(self, value):
+        value = value.strip()
+        if not PHONE_RE.match(value):
+            raise serializers.ValidationError(
+                "Telefon numarası +90XXXXXXXXXX formatında olmalıdır."
+            )
+        return value
 
 
 class PublicServiceListSerializer(serializers.ModelSerializer):

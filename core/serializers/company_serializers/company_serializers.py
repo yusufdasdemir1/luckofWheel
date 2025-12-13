@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from core.models import EarnedWins,Companies
 from core.exceptions import SimpleError
+import re
+
 
 class EarnedWinsSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.name", read_only=True)
@@ -21,6 +23,8 @@ class EarnedWinSerializer(serializers.ModelSerializer):
     class Meta:
         model = EarnedWins
         fields = ["id", "title", "description"]
+
+PHONE_RE = re.compile(r'^\+90\d{10}$')
 
 class CompanyUpdateSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
@@ -48,6 +52,16 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
                 raise SimpleError(f"Thumbnail için izin verilen uzantılar: {', '.join(self.allowed_extensions)}")
 
         return attrs
+
+
+    def validate_phone(self, value):
+        value = value.strip()
+        if not PHONE_RE.match(value):
+            raise serializers.ValidationError(
+                "Telefon numarası +90XXXXXXXXXX formatında olmalıdır."
+            )
+        return value
+
 
 
 class CompanyResponseSerializer(serializers.ModelSerializer):
