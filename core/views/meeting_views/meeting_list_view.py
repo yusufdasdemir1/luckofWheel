@@ -21,7 +21,7 @@ class MeetingListView(APIView):
                             status=status.HTTP_403_FORBIDDEN
                             )
 
-        meetings_list=Meetings.objects.filter(company=user.company).select_related("company","user").order_by('-date', '-time')
+        meetings_list=Meetings.objects.filter(company=user.company).select_related("company","user").order_by('-created_at')
 
         if not meetings_list:
             return Response({"message":"firmanıza ait randevu bulunmamakta."},status=status.HTTP_404_NOT_FOUND)

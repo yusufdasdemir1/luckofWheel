@@ -8,6 +8,7 @@ from core.serializers.public_serializers.public_serializers import PublicMeeting
 from django.utils import timezone
 from core.models import EarnedWins
 from core.services.mail_service import MailService
+from django.db import transaction
 
 
 class MeetingCreateView(APIView):
@@ -93,7 +94,7 @@ class MeetingCreateView(APIView):
             is_used=False
         ).order_by("-created_at").first()
 
-        MailService.send(
+        transaction.on_commit(lambda: MailService.send(
             company=company,
             key=MailTemplate.APPOINTMENT_CREATED,
             to_email=user.email,
@@ -106,7 +107,7 @@ class MeetingCreateView(APIView):
                 "company_phone": company.phone,
                 "service_title": meeting.service_title,
             }
-        )
+        ))
 
         return Response(
             {
