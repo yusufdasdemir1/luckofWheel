@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from core.models import Meetings,MeetingStatus,MailTemplate
 from core.serializers.meeting_serializers.meeting_serializers import MeetingCancelSerializer
 from core.services.mail_service import MailService
+from django.db import transaction
 
 
 class MeetingCancelView(APIView):
@@ -60,7 +61,7 @@ class MeetingCancelView(APIView):
             company = meeting.company
 
             if customer.email:
-                MailService.send(
+                transaction.on_commit(lambda: MailService.send_async(
                     company=company,
                     key=MailTemplate.APPOINTMENT_CANCELLED,
                     to_email=customer.email,
@@ -72,7 +73,7 @@ class MeetingCancelView(APIView):
                         "service_title": meeting.service_title,
                         "company_phone": company.phone
                     }
-                )
+                ))
 
         readable_status = dict(MeetingStatus.choices).get(new_status)
 

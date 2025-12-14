@@ -94,7 +94,7 @@ class MeetingCreateView(APIView):
             is_used=False
         ).order_by("-created_at").first()
 
-        transaction.on_commit(lambda: MailService.send(
+        transaction.on_commit(lambda: MailService.send_async(
             company=company,
             key=MailTemplate.APPOINTMENT_CREATED,
             to_email=user.email,

@@ -3,6 +3,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from core.models import MailTemplate, MailLog
 from core.services.mail_template_service import create_default_mail_templates
+import threading
+
 
 
 class MailService:
@@ -64,11 +66,24 @@ class MailService:
 
             msg.reply_to = [company.email]
             msg.attach_alternative(html_body, "text/html")
-            msg.send()
+            sent_count = msg.send(fail_silently=True)
 
-            log.is_sent = True
-            log.save(update_fields=["is_sent"])
+            if sent_count > 0:
+                log.is_sent = True
+            else:
+                log.error_message = "SMTP send failed (fail_silently=True)"
+
+            log.save(update_fields=["is_sent", "error_message"])
 
         except Exception as e:
+        # Safety net – normalde düşmez
             log.error_message = str(e)
             log.save(update_fields=["error_message"])
+
+    @staticmethod
+    def send_async(*args, **kwargs):
+        threading.Thread(
+            target=MailService.send,
+            args=args,
+            kwargs=kwargs,
+        ).start()
