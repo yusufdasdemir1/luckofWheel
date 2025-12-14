@@ -4,8 +4,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
-from core.models import Meetings,MeetingStatus
+from core.models import Meetings,MeetingStatus,MailTemplate
 from core.serializers.meeting_serializers.meeting_serializers import MeetingCancelSerializer
+from core.services.mail_service import MailService
 
 
 class MeetingCancelView(APIView):
@@ -41,17 +42,39 @@ class MeetingCancelView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        old_status = meeting.status
+
         # ✅ Serializer doğrulama
         serializer = MeetingCancelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        meeting_status = serializer.validated_data["status"]
+        new_status = serializer.validated_data["status"]
 
         # 🔁 Durumu güncelle
-        meeting.status = meeting_status
+        meeting.status = new_status
         meeting.save()
 
-        readable_status = dict(MeetingStatus.choices).get(meeting_status)
+        if old_status != MeetingStatus.CANCELED and new_status == MeetingStatus.CANCELED:
+
+            customer = meeting.user
+            company = meeting.company
+
+            if customer.email:
+                MailService.send(
+                    company=company,
+                    key=MailTemplate.APPOINTMENT_CANCELLED,
+                    to_email=customer.email,
+                    context_data={
+                        "user_name": customer.name,
+                        "company_name": company.title,
+                        "meeting_date": meeting.date.strftime("%d.%m.%Y"),
+                        "meeting_time": meeting.time.strftime("%H:%M"),
+                        "service_title": meeting.service_title,
+                        "company_phone": company.phone
+                    }
+                )
+
+        readable_status = dict(MeetingStatus.choices).get(new_status)
 
         return Response(
             {

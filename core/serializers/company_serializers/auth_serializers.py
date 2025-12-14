@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from core.models import Users,Companies
+import re
 
+
+PHONE_RE = re.compile(r'^\+90\d{10}$')
 class RegisterSerializer(serializers.Serializer):
     # USER fields
     name = serializers.CharField(max_length=255,required=True)
@@ -17,6 +20,14 @@ class RegisterSerializer(serializers.Serializer):
     company_phone = serializers.CharField(required=True)
     show_before_meeting = serializers.BooleanField(default=False)
     is_show_wheel = serializers.BooleanField(default=True)
+
+    def validate_company_phone(self, value):
+        value = value.strip()
+        if not PHONE_RE.match(value):
+            raise serializers.ValidationError(
+                "Telefon numarası +90XXXXXXXXXX formatında olmalıdır."
+            )
+        return value
 
 
 class LoginSerializer(serializers.Serializer):

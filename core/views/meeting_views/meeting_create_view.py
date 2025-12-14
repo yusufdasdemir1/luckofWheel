@@ -3,9 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
-from core.models import Companies, Users, Meetings, Services
+from core.models import Companies, Users, Meetings, Services,MailTemplate
 from core.serializers.public_serializers.public_serializers import PublicMeetingCreateSerializer
 from django.utils import timezone
+from core.models import EarnedWins
+from core.services.mail_service import MailService
+
 
 class MeetingCreateView(APIView):
     @swagger_auto_schema(
@@ -73,7 +76,7 @@ class MeetingCreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        Meetings.objects.create(
+        meeting=Meetings.objects.create(
             user=user,
             company=company,
             service_title=service.title,
@@ -82,6 +85,27 @@ class MeetingCreateView(APIView):
             date=date,
             time=time,
             end_time=end_time,
+        )
+
+        earned_gift = EarnedWins.objects.filter(
+            user=user,
+            company=company,
+            is_used=False
+        ).order_by("-created_at").first()
+
+        MailService.send(
+            company=company,
+            key=MailTemplate.APPOINTMENT_CREATED,
+            to_email=user.email,
+            context_data={
+                "user_name": user.name,
+                "company_name": company.title,
+                "meeting_date": meeting.date.strftime("%d.%m.%Y"),
+                "meeting_time": meeting.time.strftime("%H:%M"),
+                "gift_title": earned_gift.gift_title if earned_gift else "-",
+                "company_phone": company.phone,
+                "service_title": meeting.service_title,
+            }
         )
 
         return Response(

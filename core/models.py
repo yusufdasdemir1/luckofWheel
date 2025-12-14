@@ -193,3 +193,49 @@ class APILog(models.Model):
 
     def __str__(self):
         return f"{self.method} {self.path} [{self.status}]"
+
+
+class MailTemplate(models.Model):
+    APPOINTMENT_CREATED = "appointment_created"
+    APPOINTMENT_CANCELLED = "appointment_cancelled"
+
+    TEMPLATE_KEYS = (
+        (APPOINTMENT_CREATED, "Randevu Oluşturuldu"),
+        (APPOINTMENT_CANCELLED, "Randevu İptal Edildi"),
+    )
+
+    company = models.ForeignKey(
+        Companies,
+        on_delete=models.CASCADE,
+        related_name="mail_templates"
+    )
+    key = models.CharField(max_length=50, choices=TEMPLATE_KEYS)
+    subject = models.CharField(max_length=255)
+    body = models.TextField(
+        help_text="HTML destekler. {{ user_name }}, {{ meeting_date }} gibi değişkenler kullanılabilir."
+    )
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("company", "key")
+
+    def __str__(self):
+        return f"{self.company.title} - {self.key}"
+
+
+
+class MailLog(models.Model):
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    to_email = models.EmailField()
+    key = models.CharField(max_length=50)
+
+    is_sent = models.BooleanField(default=False)
+    error_message = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.company.title} | {self.key} | {self.to_email}"

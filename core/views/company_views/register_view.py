@@ -8,6 +8,8 @@ from core.serializers.company_serializers.auth_serializers import RegisterSerial
 from core.models import Users, Companies
 from django.db import IntegrityError, transaction
 from django.contrib.auth.hashers import make_password
+from core.services.mail_template_service import create_default_mail_templates
+
 
 class RegisterView(APIView):
     @swagger_auto_schema(
@@ -80,6 +82,8 @@ class RegisterView(APIView):
                     is_show_wheel=data.get("is_show_wheel", True),
                     slug=slugify(data["company_title"]),
                 )
+                #default mail oluştur
+                create_default_mail_templates(company)
 
                 user = Users.objects.create(
                     name=data["name"],
