@@ -41,6 +41,7 @@ class MeetingCreateView(APIView):
         service_title=serializer.validated_data["service_title"]
         date=serializer.validated_data["date"]
         time=serializer.validated_data["time"]
+        note=serializer.validated_data["note"]
 
         try:
             user = Users.objects.get(phone=phone, company=company)
@@ -86,6 +87,7 @@ class MeetingCreateView(APIView):
             date=date,
             time=time,
             end_time=end_time,
+            note=note
         )
 
         earned_gift = EarnedWins.objects.filter(
@@ -114,6 +116,7 @@ class MeetingCreateView(APIView):
                 "message": f"Randevunuz oluşturuldu: {service.title} ({date} {time} - {end_time})",
                 "duration": f"{service.duration} dakika",
                 "price": f"{service.price} ₺",
+                "note": f"{note}",
             },
             status=status.HTTP_201_CREATED
         )

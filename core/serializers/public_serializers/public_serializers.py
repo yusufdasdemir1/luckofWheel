@@ -46,6 +46,11 @@ class PublicMeetingCreateSerializer(serializers.Serializer):
     service_title = serializers.CharField(max_length=255)
     date = serializers.DateField()
     time = serializers.TimeField()
+    note=serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Opsiyonel müşteri notu"
+    )
 
 
 class GiftPublicListSerializer(serializers.ModelSerializer):
