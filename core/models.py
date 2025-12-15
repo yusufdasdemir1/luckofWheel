@@ -234,6 +234,11 @@ class MailLog(models.Model):
 
     is_sent = models.BooleanField(default=False)
     error_message = models.TextField(blank=True, null=True)
+    provider_message_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
