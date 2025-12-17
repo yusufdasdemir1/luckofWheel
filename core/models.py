@@ -25,6 +25,10 @@ class Companies(models.Model):
     district=models.TextField(blank=True, null=False, default='')
     company_color = models.CharField(blank=True, default="")
 
+    youtube_url=models.TextField(blank=True, null=False, default='')
+    instagram_url = models.TextField(blank=True, null=False, default='')
+    facebook_url = models.TextField(blank=True, null=False, default='')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
