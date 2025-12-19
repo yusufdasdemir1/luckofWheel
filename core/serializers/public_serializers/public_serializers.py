@@ -78,15 +78,4 @@ class ShowCompaniesSerializer(serializers.ModelSerializer):
 class PublicCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Companies
-        fields = [
-            "title",
-            "description",
-            "phone",
-            "email",
-            "slug",
-            "address_text",
-            "embed_address",
-            "city",
-            "district",
-            "logo"
-        ]
+        exclude=["created_at","updated_at","thumbnail","is_show_wheel","show_before_meeting","spin_cooldown_hours","status"]
