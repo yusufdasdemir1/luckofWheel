@@ -9,6 +9,6 @@ from core.serializers.public_serializers.public_serializers import ShowCompanies
 class ShowCompaniesView(APIView):
     @swagger_auto_schema(tags=["PUBLIC"])
     def get(self,request):
-        companies = Companies.objects.all()
+        companies = Companies.objects.filter(status="active")
         serializer = ShowCompaniesSerializer(companies, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
