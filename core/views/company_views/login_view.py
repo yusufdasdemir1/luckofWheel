@@ -22,7 +22,7 @@ class LoginView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        company_email = serializer.validated_data.get("email")
+        company_email = serializer.validated_data.get("email").strip().lower()
         password = serializer.validated_data.get("password")
 
         try:
