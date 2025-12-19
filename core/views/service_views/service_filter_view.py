@@ -25,8 +25,6 @@ class ServiceFilterView(APIView):
                 "Parametrelerin hiçbiri zorunlu değildir — hepsi birlikte veya ayrı ayrı kullanılabilir."
         ),
         manual_parameters=[
-            openapi.Parameter("min_price", openapi.IN_QUERY, type=openapi.TYPE_NUMBER, description="Minimum fiyat"),
-            openapi.Parameter("max_price", openapi.IN_QUERY, type=openapi.TYPE_NUMBER, description="Maksimum fiyat"),
             openapi.Parameter("min_duration", openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
                               description="Minimum süre (dk)"),
             openapi.Parameter("max_duration", openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
@@ -48,8 +46,7 @@ class ServiceFilterView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        min_price = request.query_params.get("min_price")
-        max_price = request.query_params.get("max_price")
+
         min_duration = request.query_params.get("min_duration")
         max_duration = request.query_params.get("max_duration")
         is_active = request.query_params.get("is_active")
@@ -57,10 +54,6 @@ class ServiceFilterView(APIView):
 
         queryset = Services.objects.filter(company=user.company)
 
-        if min_price:
-            queryset = queryset.filter(price__gte=min_price)
-        if max_price:
-            queryset = queryset.filter(price__lte=max_price)
 
         if min_duration:
             queryset = queryset.filter(duration__gte=min_duration)
