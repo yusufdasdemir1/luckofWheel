@@ -7,6 +7,7 @@ from core.views.company_views.spin_history_view import CompanySpinHistoryView
 from core.views.company_views.update_company_view import CompanyUpdateView
 from core.views.company_views.update_is_used_view import EarnedWinStatusUpdateView
 from core.views.company_views.my_information_view import MeView
+from core.views.company_views.earned_wins_delete import EarnedWinsDeleteView
 
 
 from core.views.public_views.public_register_view import PublicRegisterView
@@ -81,4 +82,5 @@ urlpatterns = [
     path("public/companies", ShowCompaniesView.as_view(), name="show_companies"),
     path("company/me", MeView.as_view(), name="me"),
     path("public/companies/<slug:slug>", PublicCompanyDetailView.as_view(), name="show_companies"),
+    path("company/earned-wins/<int:earned_wins_id>",EarnedWinsDeleteView.as_view(), name="earned_wins_delete"),
 ]

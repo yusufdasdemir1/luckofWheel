@@ -68,3 +68,20 @@ class CompanyResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Companies
         exclude = ["slug", "created_at", "updated_at", "status"]
+
+
+class EarnedWinDeleteSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source="user.name", read_only=True)
+    user_phone = serializers.CharField(source="user.phone", read_only=True)
+
+    class Meta:
+        model = EarnedWins
+        fields = [
+            "id",
+            "user_name",
+            "user_phone",
+            "gift_title",
+            "gift_chance",
+            "is_used",
+            "created_at",
+        ]

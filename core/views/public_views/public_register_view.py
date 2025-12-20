@@ -71,7 +71,7 @@ class PublicRegisterView(APIView):
 
         name = serializer.validated_data["name"]
         surname = serializer.validated_data["surname"]
-        email = serializer.validated_data["email"]
+        email = serializer.validated_data["email"].strip().lower()
         phone = serializer.validated_data["phone"]
 
         # ❗ 1️⃣ Email veya phone çakışma kontrolü
