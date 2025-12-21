@@ -158,7 +158,7 @@ class PublicRegisterView(APIView):
 
         return Response(
             {
-                "message": f"Tebrikler! {selected_gift.title} kazandınız 🎉",
+                "message": f"{selected_gift.description}",
                 "gift_views": selected_gift.title,
                 "company": company.title,
                 "next_spin_available_in_hours": company.spin_cooldown_hours,
