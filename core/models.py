@@ -144,7 +144,7 @@ class Meetings(models.Model):
 
     service_title = models.CharField(max_length=255)
     service_duration = models.PositiveIntegerField()
-    service_price = models.DecimalField(max_digits=10, decimal_places=2)
+    service_price = models.CharField(max_length=100)
     note = models.TextField(blank=True, null=True)
 
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='meetings')
