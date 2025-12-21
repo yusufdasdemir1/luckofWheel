@@ -52,6 +52,14 @@ class PublicMeetingCreateSerializer(serializers.Serializer):
         help_text="Opsiyonel müşteri notu"
     )
 
+    def validate_phone(self, value):
+        value = value.strip()
+        if not PHONE_RE.match(value):
+            raise serializers.ValidationError(
+                "Telefon numarası +90XXXXXXXXXX formatında olmalıdır."
+            )
+        return value
+
 
 class GiftPublicListSerializer(serializers.ModelSerializer):
     class Meta:
