@@ -18,8 +18,7 @@ class RegisterSerializer(serializers.Serializer):
                                            error_messages={"invalid": "Geçerli bir email adresi giriniz."}
                                            )
     company_phone = serializers.CharField(required=True)
-    show_before_meeting = serializers.BooleanField(default=False)
-    is_show_wheel = serializers.BooleanField(default=True)
+    wheel_mode = serializers.ChoiceField(choices=Companies.WHEEL_MODE_CHOICES, default=Companies.WHEEL_BEFORE)
 
     def validate_company_phone(self, value):
         value = value.strip()
@@ -52,15 +51,30 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    is_show_wheel = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = Companies
-        fields = ["id", "title", "description", "phone", "email", "slug","is_show_wheel","show_before_meeting","spin_cooldown_hours",
-                  "logo", "thumbnail","embed_address","address_text","status","company_color","city","district","instagram_url","youtube_url","facebook_url"]
+        fields = ["id", "title", "description", "phone", "email", "slug","is_show_wheel","wheel_mode","spin_cooldown_hours",
+                  "logo", "thumbnail","embed_address","address_text","status","city","district","instagram_url","youtube_url","facebook_url"]
 
 
 class UserSerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)  # 🔹 company bilgilerini iç içe dahil ediyoruz
+    role = serializers.SerializerMethodField()
+    staff_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Users
-        fields = ["id", "name", "surname","company"]
+        fields = ["id", "name", "surname", "email", "role", "staff_id", "company"]
+
+    def get_role(self, obj):
+        # owner: firma sahibi, staff: çalışan (kuaför), customer: müşteri
+        if obj.is_admin:
+            return "owner"
+        if obj.is_company_staff:
+            return "staff"
+        return "customer"
+
+    def get_staff_id(self, obj):
+        return obj.staff_profile.id if obj.is_company_staff else None

@@ -9,6 +9,7 @@ from core.models import Users, Companies
 from django.db import IntegrityError, transaction
 from django.contrib.auth.hashers import make_password
 from core.services.mail_template_service import create_default_mail_templates
+from core.services.working_hours import ensure_default_working_hours
 
 
 class RegisterView(APIView):
@@ -78,12 +79,12 @@ class RegisterView(APIView):
                     description=data.get("company_description", ""),
                     email=email,
                     phone=phone,
-                    show_before_meeting=data.get("show_before_meeting", False),
-                    is_show_wheel=data.get("is_show_wheel", True),
+                    wheel_mode=data.get("wheel_mode", Companies.WHEEL_BEFORE),
                     slug=slugify(data["company_title"]),
                 )
                 #default mail oluştur
                 create_default_mail_templates(company)
+                ensure_default_working_hours(company)
 
                 user = Users.objects.create(
                     name=data["name"],

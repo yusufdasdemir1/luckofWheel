@@ -4,6 +4,8 @@ from core.views.company_views.login_view import LoginView
 from core.views.company_views.register_view import RegisterView
 from core.views.company_views.logout_view import LogoutView
 from core.views.company_views.spin_history_view import CompanySpinHistoryView
+from core.views.company_views.spin_statistics_view import SpinStatisticsView
+from core.views.bulk_delete import MeetingBulkDeleteView, EarnedWinsBulkDeleteView
 from core.views.company_views.update_company_view import CompanyUpdateView
 from core.views.company_views.update_is_used_view import EarnedWinStatusUpdateView
 from core.views.company_views.my_information_view import MeView
@@ -11,11 +13,19 @@ from core.views.company_views.earned_wins_delete import EarnedWinsDeleteView
 
 
 from core.views.public_views.public_register_view import PublicRegisterView
+from core.views.public_views.public_spin_view import PublicSpinView
 from core.views.public_views.public_show_services_view import PublicServiceListView
 from core.views.public_views.public_show_gifts import PublicGiftView
 from core.views.public_views.public_show_available_meetings import PublicOccupiedMeetingsView
 from core.views.public_views.public_show_companies import ShowCompaniesView
+from core.views.public_views.public_salon_application_view import PublicSalonApplicationView
+from core.views.public_views.public_staff_hours_views import PublicStaffListView, PublicWorkingHoursView
+from core.views.staff_views.staff_views import StaffListCreateView, StaffDetailView
+from core.views.staff_views.staff_photo_view import StaffPhotoView
+from core.views.company_views.working_hours_view import CompanyWorkingHoursView
 from core.views.public_views.public_show_company_detail import PublicCompanyDetailView
+from core.views.public_views.public_review_views import PublicReviewView, PublicReviewListView
+from core.views.review_views.review_panel_views import ReviewListView, ReviewDetailView
 
 
 from core.views.gift_views.gift_list_view import GiftListView
@@ -52,8 +62,10 @@ urlpatterns = [
     path('company/login', LoginView.as_view(), name='login'),
     path('company/register', RegisterView.as_view(), name='register'),
     path("public/register/<slug:slug>", PublicRegisterView.as_view(), name="public_views"),
+    path("public/spin/<slug:slug>", PublicSpinView.as_view(), name="public_spin"),
     path("company/gifts/create", GiftCreateView.as_view(), name="gift_create"),
     path("spin_history", CompanySpinHistoryView.as_view(), name="company_spin_history"),
+    path("spin_history/statistics", SpinStatisticsView.as_view(), name="company_spin_statistics"),
     path("companies/<slug:company_slug>", CompanyUpdateView.as_view(), name="company-update"),
     path("company/earned-wins/status/<int:earned_win_id>", EarnedWinStatusUpdateView.as_view(), name="company_is_used"),
     path("company/gifts/list", GiftListView.as_view(), name="gift_list"),
@@ -74,13 +86,26 @@ urlpatterns = [
     path("company/meetings/update/<int:meeting_id>", MeetingUpdateView.as_view(), name="meeting-update"),
     path("company/meetings/detail/<int:meeting_id>", MeetingDetailView.as_view(), name="meeting-detail"),
     path("company/meetings/delete/<int:meeting_id>", MeetingDeleteView.as_view(), name="meeting-delete"),
+    path("company/meetings/bulk-delete", MeetingBulkDeleteView.as_view(), name="meeting-bulk-delete"),
+    path("company/earned-wins/bulk-delete", EarnedWinsBulkDeleteView.as_view(), name="earned-wins-bulk-delete"),
     path("company/meetings/cancel/<int:meeting_id>", MeetingCancelView.as_view(), name="meeting-cancel"),
     path("meetings/statistics", MeetingStatisticsView.as_view(), name="meeting-statistics"),
     path("public/gifts/<slug:slug>", PublicGiftView.as_view(), name="public_gift_list"),
     path("company/logout", LogoutView.as_view(), name="logout"),
     path("public/occupied-meetings/<slug>",PublicOccupiedMeetingsView.as_view(), name="public-occupied-meetings"),
     path("public/companies", ShowCompaniesView.as_view(), name="show_companies"),
+    path("public/salon-application", PublicSalonApplicationView.as_view(), name="public-salon-application"),
+    path("public/staff/<slug:slug>", PublicStaffListView.as_view(), name="public-staff-list"),
+    path("public/working-hours/<slug:slug>", PublicWorkingHoursView.as_view(), name="public-working-hours"),
+    path("company/staff", StaffListCreateView.as_view(), name="staff-list-create"),
+    path("company/staff/<int:staff_id>", StaffDetailView.as_view(), name="staff-detail"),
+    path("company/staff/<int:staff_id>/photo", StaffPhotoView.as_view(), name="staff-photo"),
+    path("company/working-hours", CompanyWorkingHoursView.as_view(), name="company-working-hours"),
     path("company/me", MeView.as_view(), name="me"),
     path("public/companies/<slug:slug>", PublicCompanyDetailView.as_view(), name="show_companies"),
     path("company/earned-wins/<int:earned_wins_id>",EarnedWinsDeleteView.as_view(), name="earned_wins_delete"),
+    path("public/review/<str:token>", PublicReviewView.as_view(), name="public-review"),
+    path("public/reviews/<slug:slug>", PublicReviewListView.as_view(), name="public-review-list"),
+    path("company/reviews", ReviewListView.as_view(), name="review-list"),
+    path("company/reviews/<int:review_id>", ReviewDetailView.as_view(), name="review-detail"),
 ]

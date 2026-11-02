@@ -70,12 +70,16 @@ class MeetingUpdateView(APIView):
         meeting.end_time = end_datetime.time()
 
         #ÇAKIŞMA KONTROLÜ
-        overlap_exists = Meetings.objects.filter(
+        overlap_qs = Meetings.objects.filter(
             company=user.company,
             date=meeting.date,
             time__lt=meeting.end_time,   # mevcut randevular bitmeden başlamış mı?
             end_time__gt=meeting.time,   # mevcut randevular başladıktan sonra mı bitiyor?
-        ).exclude(id=meeting.id).exists()  # kendisini hariç tut!
+        ).exclude(id=meeting.id)  # kendisini hariç tut!
+        if meeting.staff_id:
+            # çalışanı olan randevu sadece kendi çalışanının takvimiyle çakışır
+            overlap_qs = overlap_qs.filter(staff_id=meeting.staff_id)
+        overlap_exists = overlap_qs.exists()
 
         if overlap_exists:
             return Response(

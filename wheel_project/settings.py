@@ -75,6 +75,13 @@ MIDDLEWARE = [
     'core.middleware.api_logger.APILogMiddleware',
 ]
 
+# Docker/prod: admin ve swagger statik dosyaları için (paket kuruluysa devreye girer)
+try:
+    import whitenoise  # noqa: F401
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+except ImportError:
+    pass
+
 ROOT_URLCONF = 'wheel_project.urls'
 
 TEMPLATES = [
@@ -133,6 +140,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "20/min",       # Anonim kullanıcı limiti
+        "salon_application": "5/hour",  # Salon başvuru formu (IP başına)
     }
 }
 
@@ -169,6 +177,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+
+# Müşteriye giden maillerdeki ön yüz linkleri (ör. randevu değerlendirme) için
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': API_BASE_URL,

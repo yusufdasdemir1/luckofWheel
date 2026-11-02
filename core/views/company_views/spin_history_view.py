@@ -3,7 +3,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 from core.models import EarnedWins
+from core.pagination import paginated_response, wants_page
+from core.permissions import scope_for, NO_ACCESS_MESSAGE
 from core.serializers.company_serializers.company_serializers import EarnedWinsSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -32,6 +35,9 @@ class CompanySpinHistoryView(APIView):
                 type=openapi.TYPE_INTEGER,
                 required=False,
             ),
+            openapi.Parameter("q", openapi.IN_QUERY, description="Müşteri adı/soyadı veya hediye adı; kelime BAŞLANGICINA göre arar (içinde geçmesi yetmez)", type=openapi.TYPE_STRING),
+            openapi.Parameter("page", openapi.IN_QUERY, description="Sayfa numarası (page/page_size/q verilirse sayfalı yanıt)", type=openapi.TYPE_INTEGER),
+            openapi.Parameter("page_size", openapi.IN_QUERY, description="Sayfa başına kayıt (en fazla 50)", type=openapi.TYPE_INTEGER),
             openapi.Parameter(
                 "is_used",
                 openapi.IN_QUERY,
@@ -44,11 +50,16 @@ class CompanySpinHistoryView(APIView):
     def get(self, request):
         user=request.user
 
-        if not user.is_admin:
-            return Response({"error": "Bu işlem için yetkiniz yok."},status=status.HTTP_403_FORBIDDEN)
+        role, staff = scope_for(user)
+        if role is None:
+            return Response({"error": NO_ACCESS_MESSAGE},status=status.HTTP_403_FORBIDDEN)
 
         #Kendi firmasına ait veriler
-        queryset=EarnedWins.objects.filter(company=user.company).select_related("user").order_by('-created_at')
+        queryset=EarnedWins.objects.filter(company=user.company)
+        if role == "staff":
+            # çalışan: kendisinden randevu alan müşterilerin hediyeleri
+            queryset=queryset.filter(user__meetings__staff=staff).distinct()
+        queryset=queryset.select_related("user","meeting").order_by('-created_at')
 
         user_id=request.query_params.get('user_id')
         is_used=request.query_params.get('is_used')
@@ -61,6 +72,19 @@ class CompanySpinHistoryView(APIView):
                 queryset = queryset.filter(is_used=True)
             elif is_used.lower() == "false":
                 queryset = queryset.filter(is_used=False)
+
+        query=request.query_params.get('q','').strip()
+        # kelime başlangıcına göre ara: "ali" -> Ali, Alizade; "salih" gelmez (içinde geçmesi yetmez)
+        for word in query.split():
+            queryset=queryset.filter(
+                Q(user__name__istartswith=word)
+                |Q(user__surname__istartswith=word)
+                |Q(gift_title__istartswith=word)
+                |Q(gift_title__icontains=f" {word}")
+            )
+
+        if wants_page(request, ("q",)):
+            return paginated_response(request, queryset, EarnedWinsSerializer)
 
         if not queryset.exists():
             return Response(

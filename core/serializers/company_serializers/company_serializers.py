@@ -7,9 +7,10 @@ import re
 class EarnedWinsSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.name", read_only=True)
     user_surname = serializers.CharField(source="user.surname", read_only=True)
+    meeting_status = serializers.CharField(source="meeting.status", read_only=True, default=None)
     class Meta:
         model = EarnedWins
-        fields = ["id","user_name","user_surname","gift_title","is_used", "created_at"]
+        fields = ["id","user_name","user_surname","gift_title","is_used", "created_at","meeting_id","meeting_status"]
 
 
 class EarnedWinStatusSerializer(serializers.Serializer):
@@ -19,10 +20,11 @@ class EarnedWinStatusSerializer(serializers.Serializer):
 class EarnedWinSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source="gift_title", read_only=True)
     description = serializers.CharField(source="gift_description", read_only=True)
+    meeting_status = serializers.CharField(source="meeting.status", read_only=True, default=None)
 
     class Meta:
         model = EarnedWins
-        fields = ["id", "title", "description"]
+        fields = ["id", "title", "description", "created_at", "meeting_id", "meeting_status"]
 
 PHONE_RE = re.compile(r'^\+90\d{10}$')
 

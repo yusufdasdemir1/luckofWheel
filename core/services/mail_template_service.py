@@ -1,5 +1,13 @@
 from core.models import MailTemplate
 
+# Randevu mailinin altındaki "değerlendir" linki. Migration 0026 mevcut şablonlara aynı metni ekler.
+REVIEW_LINK_SNIPPET = (
+    "\n"
+    "⭐ Randevunuzdan sonra deneyiminizi paylaşmak isterseniz:\n"
+    '<a href="{{ review_url }}">Randevuyu değerlendir</a>\n'
+)
+
+
 def create_default_mail_templates(company):
     """
     Firma ilk kez oluşturulduğunda
@@ -31,8 +39,7 @@ Saygılarımızla,
 
 📞 İletişim:
 {{ company_phone }}
-
-"""
+""" + REVIEW_LINK_SNIPPET
         }
     )
 

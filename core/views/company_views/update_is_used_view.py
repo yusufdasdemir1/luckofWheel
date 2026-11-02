@@ -6,6 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from core.models import EarnedWins
+from core.permissions import scope_for, NO_ACCESS_MESSAGE
 from core.serializers.company_serializers.company_serializers import EarnedWinStatusSerializer
 
 
@@ -39,17 +40,21 @@ class EarnedWinStatusUpdateView(APIView):
     def patch(self, request, earned_win_id):
         user = request.user
 
-        # 🔒 Sadece adminler erişebilir
-        if not user.is_admin:
+        # 🔒 Firma sahibi ya da (kendi müşterilerinin hediyeleri için) çalışan
+        role, staff = scope_for(user)
+        if role is None:
             return Response(
-                {"error": "Bu işlem sadece admin kullanıcılar içindir."},
+                {"error": NO_ACCESS_MESSAGE},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 🎯 Güncellenecek kayıt: sadece kendi şirketine ait olmalı
-        try:
-            earned_win = EarnedWins.objects.get(id=earned_win_id, company=user.company)
-        except EarnedWins.DoesNotExist:
+        # 🎯 Güncellenecek kayıt: sadece kendi şirketine (çalışan için kendi müşterilerine) ait olmalı
+        wins = EarnedWins.objects.filter(id=earned_win_id, company=user.company)
+        if role == "staff":
+            wins = wins.filter(user__meetings__staff=staff).distinct()
+        earned_win = wins.first()
+
+        if earned_win is None:
             return Response(
                 {"error": "Bu ödül kaydı bulunamadı veya size ait değil."},
                 status=status.HTTP_404_NOT_FOUND

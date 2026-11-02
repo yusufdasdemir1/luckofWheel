@@ -1,53 +1,45 @@
-from django.db import models, IntegrityError
-from django.utils import timezone
+from django.db import models
 from django.contrib.auth.hashers import make_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from core.models import Companies, Users, Gifts, EarnedWins
+from core.models import Companies, Users
 from core.serializers.public_serializers.public_serializers import PublicRegisterSerializer
-import random
+from core.services.spin import spin_status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 
 class PublicRegisterView(APIView):
     @swagger_auto_schema(
-        operation_summary="🎡 Müşteri formu doldur + spin çevir (public endpoint)",
+        operation_summary="🎡 Müşteri formu doldur (public endpoint)",
         operation_description=(
-            "Bu endpoint müşterinin form doldurup çark çevirmesini sağlar.\n\n"
+            "Bu endpoint müşteriyi kaydeder (ya da mevcut müşteriyi bulur) ve çark hakkını bildirir.\n\n"
             "1️⃣ Firma slug’ına göre firma bulunur.\n"
-            "2️⃣ Aynı firmada aynı e-posta veya telefon kayıtlıysa hata döner.\n"
-            "3️⃣ 48 saat dolmadan spin çevirmeye çalışılırsa kalan süre belirtilir.\n"
-            "4️⃣ Rastgele bir hediye seçilir ve `EarnedWins` tablosuna kaydedilir.\n\n"
+            "2️⃣ Aynı firmada aynı e-posta veya telefon başka biriyle kayıtlıysa hata döner.\n"
+            "3️⃣ Çark burada çevrilmez; cevapta müşterinin çark hakkı (`can_spin`, `remaining_seconds`) döner. "
+            "Çark `/public/spin/<slug>` ile müşteri butona basınca çevrilir.\n\n"
             "**Not:** Şifre alanı otomatik olarak `guest_user` olarak hash'lenir."
         ),
         request_body=PublicRegisterSerializer,
         responses={
             201: openapi.Response(
-                description="Spin sonucu başarıyla döndürüldü.",
+                description="Müşteri kaydedildi, çark hakkı döndü.",
                 examples={
                     "application/json": {
-                        "message": "Tebrikler! %20 indirim kazandınız 🎉",
-                        "gift_views": "%20 indirim",
+                        "message": "Kayıt tamamlandı.",
                         "company": "Beauty of Yusuf",
-                        "next_spin_available_in_hours": 48,
+                        "wheel_mode": "before",
+                        "can_spin": False,
+                        "remaining_seconds": 93600,
                     }
                 },
             ),
             400: openapi.Response(
-                description="Hatalı istek veya spin süresi dolmadı.",
+                description="Hatalı istek veya e-posta/telefon başkasına ait.",
                 examples={
                     "application/json": {
-                        "error": "Henüz spin hakkınız yenilenmedi. 1 gün 3 saat sonra tekrar deneyin."
-                    }
-                },
-            ),
-            403: openapi.Response(
-                description="Çark admin tarafından kapatıldı.",
-                examples={
-                    "application/json": {
-                        "error": "Bu kullanıcı için çark geçici olarak kapatılmış. Lütfen firma ile iletişime geçin."
+                        "error": "Bu e-posta adresi bu firmada zaten kayıtlı. Lütfen farklı bir e-posta girin."
                     }
                 },
             ),
@@ -105,63 +97,14 @@ class PublicRegisterView(APIView):
                 is_admin=False,
             )
 
-        # ❌ Eğer admin çarkı kapattıysa
-        if not company.is_show_wheel:
-            return Response(
-                {"error": "Bu şirket için çark geçici olarak kapatılmış. Lütfen firma ile iletişime geçin."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-
-        last_spin = EarnedWins.objects.filter(user=user).order_by("-created_at").first()
-        if last_spin:
-            cooldown = company.spin_cooldown_hours
-            elapsed_hours = (timezone.now() - last_spin.created_at).total_seconds() / 3600
-            if elapsed_hours < cooldown:
-                remaining_hours = cooldown - elapsed_hours
-                days = int(remaining_hours // 24)
-                hours = int(remaining_hours % 24)
-                if days > 0 and hours > 0:
-                    msg = f"Henüz spin hakkınız yenilenmedi. {days} gün {hours} saat sonra tekrar deneyin."
-                elif days > 0:
-                    msg = f"Henüz spin hakkınız yenilenmedi. {days} gün sonra tekrar deneyin."
-                else:
-                    msg = f"Henüz spin hakkınız yenilenmedi. {hours} saat sonra tekrar deneyin."
-                return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
-
-        # 🎁 Rastgele ödül seçimi
-        gifts = Gifts.objects.filter(company=company,is_active=True)
-        if not gifts.exists():
-            return Response([], status=status.HTTP_200_OK)
-
-        total_chance = sum(g.chance for g in gifts)
-        rand = random.uniform(0, total_chance)
-        cumulative = 0
-        selected_gift = None
-        for gift in gifts:
-            cumulative += gift.chance
-            if rand <= cumulative:
-                selected_gift = gift
-                break
-
-        if not selected_gift:
-            selected_gift = random.choice(gifts)
-
-        # 🧾 Kaydet
-        EarnedWins.objects.create(
-            user=user,
-            company=company,
-            gift_title=selected_gift.title,
-            gift_description=selected_gift.description,
-            gift_chance=selected_gift.chance
-        )
-
+        # Burada çevirme yoktur: sadece müşteri kaydı ve çark hakkı bilgisi döner.
+        # Çark `/public/spin/<slug>` ile müşteri butona basınca çevrilir.
         return Response(
             {
-                "message": f"{selected_gift.description}",
-                "gift_views": selected_gift.title,
+                "message": "Kayıt tamamlandı.",
                 "company": company.title,
-                "next_spin_available_in_hours": company.spin_cooldown_hours,
+                "wheel_mode": company.wheel_mode,
+                **spin_status(user, company),
             },
             status=status.HTTP_201_CREATED,
         )

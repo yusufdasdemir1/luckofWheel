@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from core.models import Meetings,MeetingStatus,MailTemplate
+from core.permissions import scope_for, NO_ACCESS_MESSAGE
 from core.serializers.meeting_serializers.meeting_serializers import MeetingCancelSerializer
 from core.services.mail_service import MailService
 from django.db import transaction
@@ -27,16 +28,21 @@ class MeetingCancelView(APIView):
     def patch(self, request, meeting_id):
         user = request.user
 
-        # 🔒 Sadece admin girebilsin
-        if not user.is_admin:
+        # 🔒 Firma sahibi ya da (kendi randevusu için) çalışan
+        role, staff = scope_for(user)
+        if role is None:
             return Response(
-                {"error": "Bu işlem sadece admin kullanıcılar içindir."},
+                {"error": NO_ACCESS_MESSAGE},
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        lookup = {"id": meeting_id, "company": user.company}
+        if role == "staff":
+            lookup["staff"] = staff
+
         # 🔍 Randevuyu getir
         try:
-            meeting = Meetings.objects.get(id=meeting_id, company=user.company)
+            meeting = Meetings.objects.get(**lookup)
         except Meetings.DoesNotExist:
             return Response(
                 {"error": f"{meeting_id} ID'sine ait bir randevu bulunamadı."},
