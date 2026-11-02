@@ -2,8 +2,11 @@ from django.template import Template, Context
 from django.conf import settings
 from core.models import MailTemplate, MailLog
 from core.services.mail_template_service import create_default_mail_templates
+import logging
 import threading
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 class MailService:
@@ -103,6 +106,52 @@ class MailService:
         except Exception as e:
             log.error_message = str(e)
             log.save(update_fields=["error_message"])
+
+    @staticmethod
+    def send_plain(to_email, subject, html_content, reply_to=None):
+        """
+        Firmaya bağlı olmayan tek seferlik mail (örn. salon başvurusu).
+        Gönderildiyse True döner. Şablon ve MailLog kullanmaz.
+        """
+        if not settings.BREVO_API_KEY and settings.DEBUG:
+            # local'de anahtar yoksa maili göndermek yerine log'a yaz
+            logger.warning("[MAIL local] to=%s subject=%s\n%s", to_email, subject, html_content)
+            return True
+
+        payload = {
+            "sender": {
+                "email": settings.BREVO_SENDER_EMAIL,
+                "name": settings.BREVO_SENDER_NAME,
+            },
+            "to": [{"email": to_email}],
+            "subject": subject,
+            "htmlContent": html_content,
+        }
+        if reply_to:
+            payload["replyTo"] = reply_to
+
+        headers = {
+            "api-key": settings.BREVO_API_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+
+        try:
+            response = requests.post(
+                MailService.BREVO_API_URL,
+                json=payload,
+                headers=headers,
+                timeout=10,
+            )
+        except Exception:
+            logger.exception("Brevo isteği başarısız")
+            return False
+
+        if response.status_code in MailService.SUCCESS_STATUS_CODES:
+            return True
+
+        logger.error("Brevo mail hatası %s: %s", response.status_code, response.text)
+        return False
 
     @staticmethod
     def send_async(*args, **kwargs):

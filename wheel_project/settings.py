@@ -75,6 +75,13 @@ MIDDLEWARE = [
     'core.middleware.api_logger.APILogMiddleware',
 ]
 
+# Docker/prod: admin ve swagger statik dosyaları için (paket kuruluysa devreye girer)
+try:
+    import whitenoise  # noqa: F401
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+except ImportError:
+    pass
+
 ROOT_URLCONF = 'wheel_project.urls'
 
 TEMPLATES = [
@@ -133,6 +140,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "20/min",       # Anonim kullanıcı limiti
+        "salon_application": "5/hour",  # Salon başvuru formu (IP başına)
     }
 }
 
@@ -170,6 +178,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
 
+# Müşteriye giden maillerdeki ön yüz linkleri (ör. randevu değerlendirme) için
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': API_BASE_URL,
 
@@ -184,7 +195,10 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,  # Django'nun kendi oturum sistemini devre dışı bırakır
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+# Tarayıcıdan API'ye istek atabilecek siteler (.env: CORS_ALLOWED_ORIGINS=https://a.com,https://b.com).
+# Liste boşsa: sadece DEBUG açıkken (local) her origin'e izin verilir, prod'da hiçbirine verilmez.
+CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "")
+CORS_ALLOW_ALL_ORIGINS = DEBUG and not CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

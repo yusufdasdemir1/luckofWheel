@@ -1,3 +1,6 @@
+import secrets
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
@@ -7,6 +10,15 @@ class Companies(models.Model):
         ('passive', 'Pasif'),
     )
 
+    WHEEL_BEFORE = 'before'
+    WHEEL_AFTER = 'after'
+    WHEEL_NONE = 'none'
+    WHEEL_MODE_CHOICES = (
+        (WHEEL_BEFORE, 'Randevudan önce'),
+        (WHEEL_AFTER, 'Randevudan sonra'),
+        (WHEEL_NONE, 'Çark yok'),
+    )
+
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=20,unique=True)
@@ -14,8 +26,12 @@ class Companies(models.Model):
     logo = models.CharField(max_length=255, blank=True, default="")
     thumbnail = models.CharField(max_length=255, blank=True, default="")
     slug = models.SlugField(unique=True)
-    is_show_wheel = models.BooleanField(default=True)
-    show_before_meeting = models.BooleanField(default=False)
+    wheel_mode = models.CharField(
+        max_length=10,
+        choices=WHEEL_MODE_CHOICES,
+        default=WHEEL_BEFORE,
+        help_text="before: çark randevudan önce, after: randevudan sonra, none: çark yok",
+    )
     spin_cooldown_hours=models.PositiveIntegerField(default=48)
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
@@ -23,15 +39,22 @@ class Companies(models.Model):
     embed_address = models.TextField(blank=True, null=False,default='')
     city=models.TextField(blank=True, null=False, default='')
     district=models.TextField(blank=True, null=False, default='')
-    company_color = models.CharField(blank=True, default="")
 
     youtube_url=models.TextField(blank=True, null=False, default='')
     instagram_url = models.TextField(blank=True, null=False, default='')
     facebook_url = models.TextField(blank=True, null=False, default='')
 
+    # onaylı yorumlardan hesaplanan önbellek (bkz. core/services/review_service.py)
+    rating_avg = models.FloatField(default=0)
+    rating_count = models.PositiveIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+    @property
+    def is_show_wheel(self):
+        return self.wheel_mode != self.WHEEL_NONE
 
     def __str__(self):
         return self.title
@@ -85,6 +108,11 @@ class Users(AbstractBaseUser, PermissionsMixin):
         return f"{self.name} {self.surname}"
 
     @property
+    def is_company_staff(self):
+        """Bir firmanın çalışanı (kuaför) mı? Çalışanlar is_admin olmaz, staff_profile'ları vardır."""
+        return hasattr(self, "staff_profile")
+
+    @property
     def is_staff(self):
         """
         Django admin uyumluluğu için zorunlu.
@@ -117,12 +145,20 @@ class EarnedWins(models.Model):
 
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='earned_wins')
     is_used = models.BooleanField(default=False)
+    meeting = models.ForeignKey(
+        "Meetings",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="wins",
+        help_text="Hediyenin bağlı olduğu randevu (eski kayıtlarda boş olabilir)",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
     def __str__(self):
-        return f"{self.user.name} - {self.gift.title}"
+        return f"{self.user.name} - {self.gift_title}"
 
 
 class MeetingStatus(models.TextChoices):
@@ -131,7 +167,18 @@ class MeetingStatus(models.TextChoices):
     CANCELED = "canceled", "İptal"
 
 
+def generate_review_token():
+    return secrets.token_urlsafe(24)
+
+
 class Meetings(models.Model):
+    # müşteriye giden maildeki "randevuyu değerlendir" linkinin anahtarı
+    review_token = models.CharField(
+        max_length=64,
+        unique=True,
+        default=generate_review_token,
+        editable=False,
+    )
     date = models.DateField()
     time = models.TimeField()
     end_time = models.TimeField()
@@ -149,6 +196,14 @@ class Meetings(models.Model):
 
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='meetings')
     company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name='meetings')
+    staff = models.ForeignKey(
+        "Staff",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="meetings",
+        help_text="Randevuyu verecek çalışan (eski randevularda boş olabilir)",
+    )
 
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -157,6 +212,32 @@ class Meetings(models.Model):
 
     def __str__(self):
         return f"{self.company.title} - {self.date} {self.time}"
+
+
+class ReviewStatus(models.TextChoices):
+    PENDING = "pending", "Beklemede"
+    APPROVED = "approved", "Onaylı"
+    HIDDEN = "hidden", "Gizli"
+
+
+class Review(models.Model):
+    """Müşterinin randevusu için bıraktığı yorum. Randevu başına en fazla bir tane."""
+    meeting = models.OneToOneField(Meetings, on_delete=models.CASCADE, related_name="review")
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(blank=True, default="")
+    status = models.CharField(max_length=10, choices=ReviewStatus.choices, default=ReviewStatus.PENDING)
+    reply = models.TextField(blank=True, default="")
+    replied_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.company.title} | {self.rating}★ | {self.status}"
 
 
 class Services(models.Model):
@@ -248,3 +329,39 @@ class MailLog(models.Model):
 
     def __str__(self):
         return f"{self.company.title} | {self.key} | {self.to_email}"
+
+
+class Staff(models.Model):
+    """Bir firmanın çalışanı (kuaför). Panelde kendi e-posta ve şifresiyle giriş yapar."""
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name="staff")
+    user = models.OneToOneField(Users, on_delete=models.CASCADE, related_name="staff_profile")
+    is_active = models.BooleanField(default=True, help_text="Pasif çalışan randevuda seçilemez ve panele giremez")
+    photo = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Çalışan fotoğrafı: public/images altındaki dosya yolu (ör. staff/ab12.webp)",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.name} {self.user.surname} ({self.company.title})"
+
+
+class WorkingHours(models.Model):
+    """Firmanın haftalık çalışma saatleri. weekday: 0=Pazartesi ... 6=Pazar."""
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE, related_name="working_hours")
+    weekday = models.PositiveSmallIntegerField()
+    is_closed = models.BooleanField(default=False)
+    opens = models.TimeField()
+    closes = models.TimeField()
+
+    class Meta:
+        unique_together = ("company", "weekday")
+        ordering = ["weekday"]
+
+    def __str__(self):
+        state = "Kapalı" if self.is_closed else f"{self.opens:%H:%M}-{self.closes:%H:%M}"
+        return f"{self.company.title} | {self.weekday} | {state}"

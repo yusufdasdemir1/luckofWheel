@@ -15,10 +15,6 @@ venv/
 .idea/
 .vscode/
 
-# Migrations
-*/migrations/*
-!*/migrations/__init__.py
-
 # Media & Static files
 media/
 staticfiles/

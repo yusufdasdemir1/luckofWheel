@@ -1,0 +1,19 @@
+# Çalıştır: docker compose up -d --build  (değerler proje klasöründeki .env'den okunur)
+# Prod'da aynı .env sunucuda prod değerleriyle doldurulur (şablon: .env.example).
+# Veritabanı Docker'da değil; DATABASE_URL .env'deki Postgres'i gösterir.
+services:
+  web:
+    build: .
+    image: cevirkazan-be
+    container_name: cevirkazan-be
+    env_file: .env
+    ports:
+      # Varsayılan 127.0.0.1: sadece makineden/Nginx'ten erişilir, internete açılmaz.
+      - "${BIND_ADDR:-127.0.0.1}:${PORT:-8000}:8000"
+    volumes:
+      # logo ve salon görselleri imajı yeniden derlemeden değiştirilebilsin
+      - ./public:/app/public
+    extra_hosts:
+      # container içinden makinedeki Postgres'e host.docker.internal ile erişilir
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

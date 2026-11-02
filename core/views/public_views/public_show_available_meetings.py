@@ -29,7 +29,14 @@ class PublicOccupiedMeetingsView(APIView):
                 description="Firmanın benzersiz slug değeri",
                 type=openapi.TYPE_STRING,
                 required=True,
-            )
+            ),
+            openapi.Parameter(
+                "staff_id",
+                openapi.IN_QUERY,
+                description="Sadece bu çalışanın dolu saatlerini getirir (opsiyonel)",
+                type=openapi.TYPE_INTEGER,
+                required=False,
+            ),
         ],
     )
     def get(self, request, slug):
@@ -40,6 +47,13 @@ class PublicOccupiedMeetingsView(APIView):
 
         # Şirkete ait aktif randevular
         meetings = Meetings.objects.filter(company=company, status__in=[MeetingStatus.WAITING, MeetingStatus.ARRIVED])
+
+        # ?staff_id=... verilirse sadece o çalışanın dolu saatleri (her çalışanın takvimi ayrıdır)
+        staff_id = request.query_params.get("staff_id")
+        if staff_id:
+            if not staff_id.isdigit():
+                return Response({"error": "Geçersiz staff_id."}, status=status.HTTP_400_BAD_REQUEST)
+            meetings = meetings.filter(staff_id=int(staff_id))
 
         serializer = MeetingOccupiedSerializer(meetings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
