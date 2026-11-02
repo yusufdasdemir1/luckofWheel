@@ -195,7 +195,10 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,  # Django'nun kendi oturum sistemini devre dışı bırakır
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+# Tarayıcıdan API'ye istek atabilecek siteler (.env: CORS_ALLOWED_ORIGINS=https://a.com,https://b.com).
+# Liste boşsa: sadece DEBUG açıkken (local) her origin'e izin verilir, prod'da hiçbirine verilmez.
+CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "")
+CORS_ALLOW_ALL_ORIGINS = DEBUG and not CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
